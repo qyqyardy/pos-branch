@@ -76,8 +76,11 @@ const auth = useAuthStore()
 const settings = useSettingsStore()
 
 const role = computed(() => auth.user?.role || '')
+const plan = computed(() => settings.store?.plan || 'premium')
 const canSettings = computed(() => role.value === 'admin')
-const canFinance = computed(() => role.value === 'admin' || role.value === 'finance')
+const canFinance = computed(
+  () => (role.value === 'admin' || role.value === 'finance') && plan.value === 'premium'
+)
 const showPOS = computed(() => role.value === 'admin' || role.value === 'cashier')
 
 function go(path) {

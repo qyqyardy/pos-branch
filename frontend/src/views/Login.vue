@@ -83,7 +83,11 @@ async function handleLogin() {
   loading.value = true
   try {
     await auth.doLogin(email.value, password.value)
-    if (auth.user?.role === 'finance') router.push('/finance')
+    await settings.loadStore(auth.token)
+
+    const plan = settings.store?.plan || 'premium'
+    if (auth.user?.role === 'finance' && plan !== 'premium') router.push('/blocked')
+    else if (auth.user?.role === 'finance') router.push('/finance')
     else router.push('/pos')
   } catch (e) {
     error.value = e?.message || 'Login gagal'

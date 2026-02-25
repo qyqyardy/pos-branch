@@ -10,6 +10,12 @@
             <div class="mt-1 text-sm text-[color:var(--muted)]">
               Trace transaksi harian dan pembukuan sederhana.
             </div>
+            <div
+              v-if="!subscriptionActive"
+              class="mt-2 inline-flex items-center rounded-full border border-red-200 bg-red-50 px-3 py-1 text-xs font-semibold text-red-700"
+            >
+              Subscription habis (read-only)
+            </div>
           </div>
 
           <div class="flex items-end gap-2">
@@ -287,7 +293,7 @@
             <button
               type="button"
               class="md:mt-5 rounded-xl bg-[color:var(--accent)] px-4 py-2 text-sm font-semibold text-white shadow-[0_14px_30px_rgba(193,122,59,0.30)] transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-60"
-              :disabled="ledgerSubmitting"
+              :disabled="ledgerSubmitting || !subscriptionActive"
               @click="addLedger"
             >
               <span v-if="!ledgerSubmitting">Tambah</span>
@@ -346,7 +352,8 @@
                     <td class="py-3 text-right">
                       <button
                         type="button"
-                        class="rounded-xl px-3 py-2 text-xs font-semibold text-[color:var(--danger)] hover:bg-red-50"
+                        class="rounded-xl px-3 py-2 text-xs font-semibold text-[color:var(--danger)] hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-transparent"
+                        :disabled="!subscriptionActive"
                         @click="removeLedger(e)"
                       >
                         Hapus
@@ -457,6 +464,7 @@ import {
 const router = useRouter()
 const auth = useAuthStore()
 const settings = useSettingsStore()
+const subscriptionActive = computed(() => settings.store?.subscription_active !== false)
 
 function todayLocalISO() {
   const d = new Date()
@@ -578,6 +586,11 @@ async function loadAll() {
       router.push('/')
       return
     }
+    if (e instanceof ApiError && e.status === 402) {
+      error.value = e?.message || 'Akses dibatasi'
+      if (auth.user?.role === 'finance') router.push('/blocked')
+      return
+    }
     error.value = e?.message || 'Unknown error'
   } finally {
     loading.value = false
@@ -659,6 +672,10 @@ async function openOrderDetail(id) {
       router.push('/')
       return
     }
+    if (e instanceof ApiError && e.status === 402) {
+      detail.value = { open: true, loading: false, error: e?.message || 'Akses dibatasi', data: null }
+      return
+    }
     detail.value = { open: true, loading: false, error: e?.message || 'Gagal memuat detail', data: null }
   }
 }
@@ -694,6 +711,10 @@ async function addLedger() {
       router.push('/')
       return
     }
+    if (e instanceof ApiError && e.status === 402) {
+      showToast(e?.message || 'Akses dibatasi')
+      return
+    }
     showToast(e?.message || 'Gagal menambah catatan')
   } finally {
     ledgerSubmitting.value = false
@@ -714,6 +735,10 @@ async function removeLedger(e) {
     if (err instanceof ApiError && err.status === 401) {
       auth.logout()
       router.push('/')
+      return
+    }
+    if (err instanceof ApiError && err.status === 402) {
+      showToast(err?.message || 'Akses dibatasi')
       return
     }
     showToast(err?.message || 'Gagal menghapus catatan')

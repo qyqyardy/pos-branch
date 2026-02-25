@@ -27,6 +27,18 @@ POS kasir sederhana untuk warkop/cafe: POS + cetak struk & kitchen ticket + dash
 - `finance`: hanya Finance, tidak bisa akses POS atau Setting
 - `admin`: akses semua (POS + Finance + Setting + Users)
 
+## Subscription & Plan (Standard/Premium)
+
+Project ini mendukung mode subscription sederhana berbasis DB (single-tenant).
+
+- `plan`: `standard` = POS saja (Finance dikunci), `premium` = POS + Finance + Ledger + role finance
+- `paid_until`: kalau sudah lewat, sistem masuk mode terbatas (blok `POST /api/orders` dan blok ledger `POST/DELETE /api/ledger`)
+
+Catatan:
+
+- Untuk deployment on-prem di VPS kamu, kamu bisa atur `plan` dan `paid_until` manual (tanpa payment gateway).
+- Ini bukan lisensi anti-tamper; user yang punya akses DB tetap bisa mengubah field ini. Untuk model SaaS/multi-tenant perlu mekanisme license server terpisah.
+
 ## Tech Stack
 
 - Backend: Go 1.22, Gorilla Mux, Postgres, JWT
@@ -107,6 +119,14 @@ Daftar migration:
 - `002_settings_users_finance.sql`: store settings + role check + order metadata + cash ledger
 - `003_store_logo.sql`: kolom logo untuk store settings
 - `004_ledger_details.sql`: ledger detail (payment_method, category)
+- `005_subscription.sql`: subscription fields (`plan`, `paid_until`)
+
+Set subscription (plan & masa aktif):
+
+```bash
+./scripts/subscription_set.sh premium 2026-03-25
+./scripts/subscription_set.sh standard 2026-03-25
+```
 
 ## Setting Toko (Nama/Alamat/Telp/Logo)
 

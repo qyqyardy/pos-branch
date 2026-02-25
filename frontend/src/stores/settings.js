@@ -9,7 +9,10 @@ function defaultStore() {
     tagline: 'Point of Sale',
     address_lines: ['', ''],
     phone: '',
-    logo_data_url: ''
+    logo_data_url: '',
+    plan: 'premium',
+    paid_until: null,
+    subscription_active: true
   }
 }
 
@@ -19,7 +22,9 @@ export const useSettingsStore = defineStore('settings', {
       try {
         const raw = localStorage.getItem(LS_KEY)
         const parsed = raw ? JSON.parse(raw) : null
-        return parsed && typeof parsed === 'object' ? parsed : defaultStore()
+        return parsed && typeof parsed === 'object'
+          ? { ...defaultStore(), ...parsed }
+          : defaultStore()
       } catch {
         return defaultStore()
       }
@@ -49,7 +54,10 @@ export const useSettingsStore = defineStore('settings', {
             ? [data.address_lines[0] || '', data.address_lines[1] || '']
             : ['', ''],
           phone: data?.phone || '',
-          logo_data_url: data?.logo_data_url || ''
+          logo_data_url: data?.logo_data_url || '',
+          plan: data?.plan || 'premium',
+          paid_until: data?.paid_until || null,
+          subscription_active: data?.subscription_active !== false
         })
       } catch (e) {
         this.error = e?.message || 'Gagal memuat setting'
@@ -76,7 +84,13 @@ export const useSettingsStore = defineStore('settings', {
           logo_data_url:
             data?.logo_data_url != null
               ? data.logo_data_url
-              : payload?.logo_data_url || this.store?.logo_data_url || ''
+              : payload?.logo_data_url || this.store?.logo_data_url || '',
+          plan: data?.plan || this.store?.plan || 'premium',
+          paid_until: data?.paid_until || this.store?.paid_until || null,
+          subscription_active:
+            data?.subscription_active != null
+              ? data.subscription_active !== false
+              : this.store?.subscription_active !== false
         })
         return this.store
       } catch (e) {

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"strings"
+	"time"
 
 	"pos-backend/internal/model"
 	"pos-backend/internal/repository"
@@ -32,6 +33,8 @@ func (h *SettingsHandler) GetStore(w http.ResponseWriter, r *http.Request) {
 				AddressLine2: "",
 				Phone:        "",
 				LogoDataURL:  "",
+				Plan:         "premium",
+				PaidUntil:    time.Now().AddDate(10, 0, 0),
 			}
 		} else {
 			http.Error(w, "Server error", 500)
@@ -39,13 +42,26 @@ func (h *SettingsHandler) GetStore(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	plan := strings.ToLower(strings.TrimSpace(s.Plan))
+	if plan != "standard" && plan != "premium" {
+		plan = "premium"
+	}
+	paidUntil := s.PaidUntil
+	if paidUntil.IsZero() {
+		paidUntil = time.Now().AddDate(10, 0, 0)
+	}
+	subActive := !paidUntil.Before(time.Now())
+
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]any{
-		"name":          s.Name,
-		"tagline":       s.Tagline,
-		"address_lines": []string{s.AddressLine1, s.AddressLine2},
-		"phone":         s.Phone,
-		"logo_data_url": s.LogoDataURL,
+		"name":                s.Name,
+		"tagline":             s.Tagline,
+		"address_lines":       []string{s.AddressLine1, s.AddressLine2},
+		"phone":               s.Phone,
+		"logo_data_url":       s.LogoDataURL,
+		"plan":                plan,
+		"paid_until":          paidUntil.Format(time.RFC3339),
+		"subscription_active": subActive,
 	})
 }
 

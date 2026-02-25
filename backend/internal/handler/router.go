@@ -55,15 +55,39 @@ func SetupRoutes(db *sql.DB) http.Handler {
 	admin.HandleFunc("/users/{id}", userAdmin.UpdateUser).Methods("PATCH", "OPTIONS")
 	admin.HandleFunc("/users/{id}", userAdmin.DeleteUser).Methods("DELETE", "OPTIONS")
 
-	api.Handle("/orders", middleware.RequireRoles("admin", "cashier")(http.HandlerFunc(order.CreateOrder))).Methods("POST", "OPTIONS")
-	api.Handle("/orders", middleware.RequireRoles("admin", "finance")(http.HandlerFunc(order.ListOrders))).Methods("GET", "OPTIONS")
-	api.Handle("/orders/{id}", middleware.RequireRoles("admin", "finance")(http.HandlerFunc(order.GetOrder))).Methods("GET", "OPTIONS")
+	api.Handle("/orders",
+		middleware.RequireSubscription(db, middleware.SubscriptionOptions{RequireActive: true})(
+			middleware.RequireRoles("admin", "cashier")(http.HandlerFunc(order.CreateOrder)),
+		),
+	).Methods("POST", "OPTIONS")
+	api.Handle("/orders",
+		middleware.RequireSubscription(db, middleware.SubscriptionOptions{RequirePlan: "premium"})(
+			middleware.RequireRoles("admin", "finance")(http.HandlerFunc(order.ListOrders)),
+		),
+	).Methods("GET", "OPTIONS")
+	api.Handle("/orders/{id}",
+		middleware.RequireSubscription(db, middleware.SubscriptionOptions{RequirePlan: "premium"})(
+			middleware.RequireRoles("admin", "finance")(http.HandlerFunc(order.GetOrder)),
+		),
+	).Methods("GET", "OPTIONS")
 
 	api.Handle("/settings/store", middleware.RequireRoles("admin")(http.HandlerFunc(settings.UpdateStore))).Methods("PUT", "OPTIONS")
 
-	api.Handle("/ledger", middleware.RequireRoles("admin", "finance")(http.HandlerFunc(ledger.List))).Methods("GET", "OPTIONS")
-	api.Handle("/ledger", middleware.RequireRoles("admin", "finance")(http.HandlerFunc(ledger.Create))).Methods("POST", "OPTIONS")
-	api.Handle("/ledger/{id}", middleware.RequireRoles("admin", "finance")(http.HandlerFunc(ledger.Delete))).Methods("DELETE", "OPTIONS")
+	api.Handle("/ledger",
+		middleware.RequireSubscription(db, middleware.SubscriptionOptions{RequirePlan: "premium"})(
+			middleware.RequireRoles("admin", "finance")(http.HandlerFunc(ledger.List)),
+		),
+	).Methods("GET", "OPTIONS")
+	api.Handle("/ledger",
+		middleware.RequireSubscription(db, middleware.SubscriptionOptions{RequirePlan: "premium", RequireActive: true})(
+			middleware.RequireRoles("admin", "finance")(http.HandlerFunc(ledger.Create)),
+		),
+	).Methods("POST", "OPTIONS")
+	api.Handle("/ledger/{id}",
+		middleware.RequireSubscription(db, middleware.SubscriptionOptions{RequirePlan: "premium", RequireActive: true})(
+			middleware.RequireRoles("admin", "finance")(http.HandlerFunc(ledger.Delete)),
+		),
+	).Methods("DELETE", "OPTIONS")
 
 	return r
 }

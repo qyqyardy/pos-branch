@@ -32,7 +32,7 @@
         </div>
 
         <button
-          v-if="auth.user?.role === 'admin' || auth.user?.role === 'finance'"
+          v-if="canFinance"
           type="button"
           class="rounded-xl border border-black/10 bg-white/70 px-3 py-2 text-sm font-semibold hover:bg-white"
           @click="router.push('/finance')"
@@ -240,7 +240,7 @@
             <button
               type="button"
               class="mt-4 w-full rounded-xl bg-[color:var(--accent)] px-4 py-3 text-base font-semibold text-white shadow-[0_14px_30px_rgba(193,122,59,0.35)] transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-60"
-              :disabled="cart.length === 0"
+              :disabled="cart.length === 0 || !subscriptionActive"
               @click="openPay"
             >
               Bayar
@@ -248,6 +248,9 @@
 
             <div class="mt-2 text-center text-xs text-[color:var(--muted)]">
               Order tersimpan setelah konfirmasi pembayaran.
+            </div>
+            <div v-if="!subscriptionActive" class="mt-2 text-center text-xs text-red-700">
+              Subscription habis. Hubungi admin/vendor untuk perpanjang.
             </div>
           </div>
         </div>
@@ -582,6 +585,13 @@ const productsError = ref('')
 
 	const toast = ref(null)
 	let toastTimer = null
+
+const plan = computed(() => settings.store?.plan || 'premium')
+const subscriptionActive = computed(() => settings.store?.subscription_active !== false)
+const canFinance = computed(
+  () =>
+    (auth.user?.role === 'admin' || auth.user?.role === 'finance') && plan.value === 'premium'
+)
 
 function showToast(type, message) {
   toast.value = { type, message }
@@ -1200,6 +1210,10 @@ function openPay() {
     showToast('error', 'Keranjang masih kosong')
     return
   }
+  if (!subscriptionActive.value) {
+    showToast('error', 'Subscription sudah habis. Hubungi admin/vendor untuk perpanjang.')
+    return
+  }
   isPayOpen.value = true
   payMethod.value = 'cash'
   cashReceived.value = ''
@@ -1296,6 +1310,10 @@ function handleLogout() {
 	    if (e instanceof ApiError && e.status === 401) {
 	      auth.logout()
 	      router.push('/')
+	      return
+	    }
+	    if (e instanceof ApiError && e.status === 402) {
+	      showToast('error', e?.message || 'Subscription tidak aktif')
 	      return
 	    }
 	    showToast('error', e?.message || 'Checkout gagal')
