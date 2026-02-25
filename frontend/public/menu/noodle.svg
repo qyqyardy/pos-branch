@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="480" viewBox="0 0 800 480">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f0b429"/>
+      <stop offset="1" stop-color="#c17a3b"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="30%" cy="12%" r="70%">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="800" height="480" fill="url(#bg)"/>
+  <rect width="800" height="480" fill="url(#glow)"/>
+
+  <g transform="translate(140 88)" fill="none" stroke="#ffffff" stroke-linecap="round">
+    <path d="M190 64 C170 90 170 114 190 140" stroke-width="10" opacity="0.30"/>
+    <path d="M248 56 C228 82 228 106 248 132" stroke-width="10" opacity="0.30"/>
+    <path d="M306 64 C286 90 286 114 306 140" stroke-width="10" opacity="0.30"/>
+  </g>
+
+  <g transform="translate(150 150)">
+    <path d="M70 52 L520 52" stroke="#ffffff" stroke-width="14" opacity="0.28" stroke-linecap="round"/>
+    <path d="M120 28 L520 28" stroke="#ffffff" stroke-width="10" opacity="0.18" stroke-linecap="round"/>
+
+    <path d="M60 92 C60 60 86 34 118 34 L472 34 C504 34 530 60 530 92" fill="none" stroke="#ffffff" stroke-width="12" opacity="0.22" stroke-linecap="round"/>
+
+    <path d="M84 110 C84 104 90 98 96 98 L494 98 C500 98 506 104 506 110 C506 210 458 292 295 292 C132 292 84 210 84 110 Z" fill="#ffffff" opacity="0.18"/>
+    <path d="M104 126 C104 126 128 160 180 170 C232 180 260 160 300 170 C340 180 376 210 430 206" stroke="#ffffff" stroke-width="10" opacity="0.25"/>
+    <path d="M116 152 C116 152 144 186 194 192 C244 198 280 182 314 192 C348 202 380 234 420 234" stroke="#ffffff" stroke-width="10" opacity="0.18"/>
+
+    <path d="M140 300 C140 344 186 380 295 380 C404 380 450 344 450 300" fill="none" stroke="#ffffff" stroke-width="16" opacity="0.26" stroke-linecap="round"/>
+
+    <text x="295" y="426" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="18" font-weight="700" letter-spacing="4" fill="#ffffff" opacity="0.70">MIE</text>
+  </g>
+</svg>
+

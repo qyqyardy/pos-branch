@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="480" viewBox="0 0 800 480">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2f7a6a"/>
+      <stop offset="1" stop-color="#173b34"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="26%" cy="12%" r="70%">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.20"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="800" height="480" fill="url(#bg)"/>
+  <rect width="800" height="480" fill="url(#glow)"/>
+
+  <g transform="translate(170 86)">
+    <path d="M90 74 C74 94 74 112 90 132" fill="none" stroke="#ffffff" stroke-width="10" opacity="0.30" stroke-linecap="round"/>
+    <path d="M144 66 C128 86 128 104 144 124" fill="none" stroke="#ffffff" stroke-width="10" opacity="0.30" stroke-linecap="round"/>
+    <path d="M198 74 C182 94 182 112 198 132" fill="none" stroke="#ffffff" stroke-width="10" opacity="0.30" stroke-linecap="round"/>
+
+    <path d="M56 150 C56 118 82 92 114 92 L358 92 C390 92 416 118 416 150 L416 330 C416 362 390 388 358 388 L114 388 C82 388 56 362 56 330 Z" fill="#ffffff" opacity="0.16"/>
+    <path d="M80 156 C80 136 96 120 116 120 L356 120 C376 120 392 136 392 156 L392 324 C392 344 376 360 356 360 L116 360 C96 360 80 344 80 324 Z" fill="#ffffff" opacity="0.22"/>
+
+    <path d="M236 150 L236 330" stroke="#ffffff" stroke-width="10" opacity="0.25" stroke-linecap="round"/>
+    <path d="M200 230 C200 206 218 188 242 188 C266 188 284 206 284 230 C284 254 266 272 242 272 C218 272 200 254 200 230 Z" fill="#ffffff" opacity="0.18"/>
+
+    <path d="M432 178 C494 178 534 222 534 276 C534 330 494 374 432 374" fill="none" stroke="#ffffff" stroke-width="22" opacity="0.20"/>
+    <path d="M432 206 C470 206 494 236 494 276 C494 316 470 346 432 346" fill="none" stroke="#ffffff" stroke-width="18" opacity="0.32"/>
+
+    <text x="236" y="430" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="18" font-weight="700" letter-spacing="4" fill="#ffffff" opacity="0.70">TEH</text>
+  </g>
+</svg>
+

@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="480" viewBox="0 0 800 480">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#c17a3b"/>
+      <stop offset="1" stop-color="#3a241b"/>
+    </linearGradient>
+    <radialGradient id="steam" cx="36%" cy="10%" r="70%">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="800" height="480" fill="url(#bg)"/>
+  <rect width="800" height="480" fill="url(#steam)"/>
+
+  <g transform="translate(170 84)">
+    <path d="M88 86 C72 104 72 124 88 142" fill="none" stroke="#ffffff" stroke-width="10" opacity="0.35" stroke-linecap="round"/>
+    <path d="M142 78 C126 96 126 116 142 134" fill="none" stroke="#ffffff" stroke-width="10" opacity="0.35" stroke-linecap="round"/>
+    <path d="M196 86 C180 104 180 124 196 142" fill="none" stroke="#ffffff" stroke-width="10" opacity="0.35" stroke-linecap="round"/>
+
+    <path d="M90 144 C56 144 32 170 32 206 L32 288 C32 322 56 348 90 348 L380 348 C414 348 440 322 440 288 L440 206 C440 170 414 144 380 144 Z" fill="#ffffff" opacity="0.18"/>
+    <path d="M102 162 C76 162 58 182 58 208 L58 286 C58 312 76 332 102 332 L368 332 C394 332 416 312 416 286 L416 208 C416 182 394 162 368 162 Z" fill="#ffffff" opacity="0.22"/>
+
+    <path d="M440 198 C508 198 552 246 552 304 C552 360 508 408 440 408" fill="none" stroke="#ffffff" stroke-width="22" opacity="0.25"/>
+    <path d="M440 228 C486 228 516 262 516 304 C516 346 486 380 440 380" fill="none" stroke="#ffffff" stroke-width="18" opacity="0.35"/>
+
+    <path d="M110 208 C110 188 126 172 146 172 L328 172 C348 172 364 188 364 208" fill="none" stroke="#ffffff" stroke-width="12" opacity="0.20" stroke-linecap="round"/>
+
+    <text x="236" y="430" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="18" font-weight="700" letter-spacing="4" fill="#ffffff" opacity="0.70">KOPI</text>
+  </g>
+</svg>
+

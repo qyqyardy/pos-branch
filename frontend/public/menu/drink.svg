@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="480" viewBox="0 0 800 480">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2f7a6a"/>
+      <stop offset="1" stop-color="#c17a3b"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="28%" cy="12%" r="70%">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.20"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="800" height="480" fill="url(#bg)"/>
+  <rect width="800" height="480" fill="url(#glow)"/>
+
+  <g transform="translate(210 78)">
+    <path d="M152 26 L222 26" stroke="#ffffff" stroke-width="12" opacity="0.22" stroke-linecap="round"/>
+    <path d="M222 26 L258 98" stroke="#ffffff" stroke-width="12" opacity="0.22" stroke-linecap="round"/>
+    <path d="M136 98 L272 98" stroke="#ffffff" stroke-width="12" opacity="0.18" stroke-linecap="round"/>
+
+    <path d="M118 120 C118 96 138 76 162 76 L246 76 C270 76 290 96 290 120 L276 332 C274 362 250 386 220 386 L188 386 C158 386 134 362 132 332 Z" fill="#ffffff" opacity="0.18"/>
+    <path d="M144 128 C144 116 154 106 166 106 L242 106 C254 106 264 116 264 128 L252 328 C250 346 236 360 218 360 L190 360 C172 360 158 346 156 328 Z" fill="#ffffff" opacity="0.22"/>
+
+    <path d="M164 220 C182 208 196 202 210 202 C224 202 238 208 256 220" fill="none" stroke="#ffffff" stroke-width="10" opacity="0.22" stroke-linecap="round"/>
+    <path d="M164 254 C182 242 196 236 210 236 C224 236 238 242 256 254" fill="none" stroke="#ffffff" stroke-width="10" opacity="0.18" stroke-linecap="round"/>
+
+    <text x="204" y="448" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="18" font-weight="700" letter-spacing="4" fill="#ffffff" opacity="0.70">MINUMAN</text>
+  </g>
+</svg>
+

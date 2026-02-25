@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="480" viewBox="0 0 800 480">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fbf5ea"/>
+      <stop offset="1" stop-color="#f0e2c6"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="30%" cy="10%" r="70%">
+      <stop offset="0" stop-color="#c17a3b" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#c17a3b" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="800" height="480" fill="url(#bg)"/>
+  <rect width="800" height="480" fill="url(#glow)"/>
+
+  <g opacity="0.65">
+    <path d="M0 360 C180 310 330 420 520 370 C650 335 720 300 800 320 L800 480 L0 480 Z" fill="#2f7a6a" opacity="0.10"/>
+    <path d="M0 350 C200 280 350 410 530 350 C660 305 725 270 800 285 L800 480 L0 480 Z" fill="#c17a3b" opacity="0.10"/>
+  </g>
+
+  <g transform="translate(88 88)">
+    <rect x="0" y="0" width="624" height="304" rx="26" fill="#ffffff" opacity="0.60"/>
+    <rect x="18" y="18" width="588" height="268" rx="22" fill="#ffffff" opacity="0.60"/>
+
+    <g transform="translate(0 24)" fill="#221711">
+      <text x="312" y="110" text-anchor="middle" font-family="ui-serif, Georgia, serif" font-size="56" font-weight="700" opacity="0.92">WARKOP</text>
+      <text x="312" y="156" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" letter-spacing="6" opacity="0.55">MENU</text>
+    </g>
+
+    <g transform="translate(256 190)">
+      <path d="M56 16 C34 16 18 34 18 56 L18 110 C18 132 34 148 56 148 L168 148 C190 148 206 132 206 110 L206 56 C206 34 190 16 168 16 Z" fill="#c17a3b" opacity="0.20"/>
+      <path d="M58 28 C44 28 34 40 34 54 L34 108 C34 122 44 134 58 134 L166 134 C180 134 192 122 192 108 L192 54 C192 40 180 28 166 28 Z" fill="#c17a3b" opacity="0.30"/>
+      <path d="M206 52 C240 52 262 76 262 108 C262 140 240 164 206 164" fill="none" stroke="#c17a3b" stroke-width="18" opacity="0.35"/>
+      <path d="M80 4 C66 18 66 32 80 46" fill="none" stroke="#221711" stroke-width="8" opacity="0.18" stroke-linecap="round"/>
+      <path d="M116 4 C102 18 102 32 116 46" fill="none" stroke="#221711" stroke-width="8" opacity="0.18" stroke-linecap="round"/>
+      <path d="M152 4 C138 18 138 32 152 46" fill="none" stroke="#221711" stroke-width="8" opacity="0.18" stroke-linecap="round"/>
+    </g>
+  </g>
+</svg>
+

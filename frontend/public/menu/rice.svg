@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="480" viewBox="0 0 800 480">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f6efe0"/>
+      <stop offset="1" stop-color="#2f7a6a"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="28%" cy="12%" r="70%">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="800" height="480" fill="url(#bg)"/>
+  <rect width="800" height="480" fill="url(#glow)"/>
+
+  <g transform="translate(150 110)">
+    <path d="M106 210 C106 146 180 106 300 106 C420 106 494 146 494 210 C494 286 416 346 300 346 C184 346 106 286 106 210 Z" fill="#221711" opacity="0.12"/>
+    <path d="M140 210 C140 164 198 134 300 134 C402 134 460 164 460 210 C460 268 396 312 300 312 C204 312 140 268 140 210 Z" fill="#ffffff" opacity="0.26"/>
+
+    <path d="M160 260 C160 300 206 332 300 332 C394 332 440 300 440 260" fill="none" stroke="#221711" stroke-width="14" opacity="0.12" stroke-linecap="round"/>
+    <path d="M174 258 C174 288 214 312 300 312 C386 312 426 288 426 258" fill="none" stroke="#ffffff" stroke-width="12" opacity="0.35" stroke-linecap="round"/>
+
+    <g fill="#ffffff" opacity="0.30">
+      <path d="M222 96 C222 78 236 64 254 64 C272 64 286 78 286 96 C286 114 272 128 254 128 C236 128 222 114 222 96 Z"/>
+      <path d="M294 86 C294 68 308 54 326 54 C344 54 358 68 358 86 C358 104 344 118 326 118 C308 118 294 104 294 86 Z"/>
+      <path d="M368 96 C368 78 382 64 400 64 C418 64 432 78 432 96 C432 114 418 128 400 128 C382 128 368 114 368 96 Z"/>
+    </g>
+
+    <text x="300" y="430" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="18" font-weight="700" letter-spacing="4" fill="#221711" opacity="0.55">NASI</text>
+  </g>
+</svg>
+

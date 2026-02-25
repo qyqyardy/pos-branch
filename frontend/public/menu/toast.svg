@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="480" viewBox="0 0 800 480">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f3d6a3"/>
+      <stop offset="1" stop-color="#c17a3b"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="28%" cy="12%" r="70%">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.20"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="800" height="480" fill="url(#bg)"/>
+  <rect width="800" height="480" fill="url(#glow)"/>
+
+  <g transform="translate(186 88)">
+    <path d="M118 54 C98 80 98 104 118 130" fill="none" stroke="#ffffff" stroke-width="10" opacity="0.28" stroke-linecap="round"/>
+    <path d="M172 46 C152 72 152 96 172 122" fill="none" stroke="#ffffff" stroke-width="10" opacity="0.28" stroke-linecap="round"/>
+    <path d="M226 54 C206 80 206 104 226 130" fill="none" stroke="#ffffff" stroke-width="10" opacity="0.28" stroke-linecap="round"/>
+
+    <path d="M94 154 C94 104 140 66 196 66 C252 66 298 104 298 154 L298 326 C298 366 266 398 226 398 L166 398 C126 398 94 366 94 326 Z" fill="#ffffff" opacity="0.16"/>
+    <path d="M118 168 C118 132 152 104 196 104 C240 104 274 132 274 168 L274 316 C274 342 254 362 228 362 L164 362 C138 362 118 342 118 316 Z" fill="#ffffff" opacity="0.22"/>
+
+    <path d="M148 234 C168 210 186 206 210 214 C236 222 244 248 230 268 C218 286 198 292 176 284 C148 274 134 254 148 234 Z" fill="#ffffff" opacity="0.18"/>
+    <path d="M214 214 C254 206 274 232 262 262" fill="none" stroke="#ffffff" stroke-width="10" opacity="0.22" stroke-linecap="round"/>
+    <path d="M132 286 C164 312 224 314 262 292" fill="none" stroke="#ffffff" stroke-width="10" opacity="0.20" stroke-linecap="round"/>
+
+    <text x="196" y="452" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="18" font-weight="700" letter-spacing="4" fill="#ffffff" opacity="0.70">ROTI</text>
+  </g>
+</svg>
+
