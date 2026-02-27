@@ -36,6 +36,7 @@ func SetupRoutes(db *sql.DB) http.Handler {
 	ledger := NewLedgerHandler(db)
 	product := NewProductHandler(db)
 	order := NewOrderHandler(db)
+	analytics := NewAnalyticsHandler(db)
 
 	r.HandleFunc("/register", auth.Register).Methods("POST", "OPTIONS")
 	r.HandleFunc("/login", auth.Login).Methods("POST", "OPTIONS")
@@ -46,6 +47,8 @@ func SetupRoutes(db *sql.DB) http.Handler {
 	api.HandleFunc("/me", auth.Me).Methods("GET", "OPTIONS")
 	api.HandleFunc("/settings/store", settings.GetStore).Methods("GET", "OPTIONS")
 	api.HandleFunc("/products", product.GetProducts).Methods("GET", "OPTIONS")
+	api.HandleFunc("/analytics/sales", analytics.GetSalesSummary).Methods("GET", "OPTIONS")
+	api.HandleFunc("/analytics/top-products", analytics.GetTopProducts).Methods("GET", "OPTIONS")
 
 	admin := api.PathPrefix("/admin").Subrouter()
 	admin.Use(middleware.RequireRoles("admin"))

@@ -68,9 +68,45 @@
               <div class="text-xs tracking-widest uppercase text-[color:var(--muted)]">Net</div>
               <div class="mt-2 font-brand text-xl">{{ formatIDR(summary.netTotal) }}</div>
             </div>
-	          </div>
-	        </div>
-	      </section>
+          </div>
+
+          <div v-if="!loading && !error" class="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
+            <!-- Revenue Trend Chart -->
+            <div class="rounded-2xl border border-black/10 bg-white/70 p-5">
+              <div class="mb-4 flex items-center justify-between">
+                <div class="font-brand text-lg">Tren Omzet (7 Hari)</div>
+              </div>
+              <div class="h-[280px]">
+                <Line
+                  v-if="chartData.sales.labels.length"
+                  :data="chartData.sales"
+                  :options="chartOptions.sales"
+                />
+                <div v-else class="flex h-full items-center justify-center text-sm text-[color:var(--muted)]">
+                  Memuat grafik...
+                </div>
+              </div>
+            </div>
+
+            <!-- Top Products Chart -->
+            <div class="rounded-2xl border border-black/10 bg-white/70 p-5">
+              <div class="mb-4 flex items-center justify-between">
+                <div class="font-brand text-lg">5 Produk Terlaris (30 Hari)</div>
+              </div>
+              <div class="h-[280px]">
+                <Bar
+                  v-if="chartData.topProducts.labels.length"
+                  :data="chartData.topProducts"
+                  :options="chartOptions.topProducts"
+                />
+                <div v-else class="flex h-full items-center justify-center text-sm text-[color:var(--muted)]">
+                  Memuat data produk...
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
 	      <section class="rounded-2xl border border-black/10 bg-[color:var(--paper)] backdrop-blur shadow-[0_18px_60px_rgba(0,0,0,0.10)]">
 	        <div class="px-5 py-4">
@@ -464,8 +500,33 @@ import {
   deleteLedgerEntry,
   getOrder,
   listLedger,
-  listOrders
+  listOrders,
+  getSalesAnalytics,
+  getTopProducts
 } from '../api/api'
+import {
+  Chart as ChartJS,
+  Title,
+  Tooltip,
+  Legend,
+  LineElement,
+  LinearScale,
+  PointElement,
+  CategoryScale,
+  BarElement
+} from 'chart.js'
+import { Line, Bar } from 'vue-chartjs'
+
+ChartJS.register(
+  Title,
+  Tooltip,
+  Legend,
+  LineElement,
+  LinearScale,
+  PointElement,
+  CategoryScale,
+  BarElement
+)
 
 const router = useRouter()
 const auth = useAuthStore()
@@ -576,13 +637,54 @@ function orderNoFromId(orderId) {
   return String(n % 100000).padStart(5, '0')
 }
 
+async function loadAnalytics() {
+  try {
+    const [salesRaw, topRaw] = await Promise.all([
+      getSalesAnalytics(auth.token),
+      getTopProducts(auth.token)
+    ])
+
+    // Format Sales Chart
+    chartData.value.sales = {
+      labels: salesRaw.map(s => {
+        const d = new Date(s.date)
+        return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })
+      }),
+      datasets: [{
+        label: 'Omzet',
+        backgroundColor: '#C17A3B',
+        borderColor: '#C17A3B',
+        borderWidth: 2,
+        tension: 0.3,
+        data: salesRaw.map(s => s.total)
+      }]
+    }
+
+    // Format Top Products Chart
+    chartData.value.topProducts = {
+      labels: topRaw.map(p => p.name),
+      datasets: [{
+        label: 'Terjual',
+        backgroundColor: 'rgba(193, 122, 59, 0.2)',
+        borderColor: '#C17A3B',
+        borderWidth: 1,
+        borderRadius: 8,
+        data: topRaw.map(p => p.qty)
+      }]
+    }
+  } catch (e) {
+    console.error('Failed to load analytics', e)
+  }
+}
+
 async function loadAll() {
   loading.value = true
   error.value = ''
   try {
     const [o, l] = await Promise.all([
       listOrders(auth.token, { date: selectedDate.value }),
-      listLedger(auth.token, { date: selectedDate.value })
+      listLedger(auth.token, { date: selectedDate.value }),
+      loadAnalytics()
     ])
     orders.value = Array.isArray(o) ? o : []
     ledger.value = Array.isArray(l) ? l : []
@@ -676,6 +778,49 @@ const detail = ref({
   error: '',
   data: null
 })
+
+const chartData = ref({
+  sales: { labels: [], datasets: [] },
+  topProducts: { labels: [], datasets: [] }
+})
+
+const chartOptions = {
+  sales: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: (ctx) => `Omzet: ${formatIDR(ctx.parsed.y)}`
+        }
+      }
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        grid: { color: 'rgba(0,0,0,0.05)' },
+        ticks: {
+          callback: v => v >= 1000000 ? `${v / 1000000}jt` : v >= 1000 ? `${v / 1000}rb` : v
+        }
+      },
+      x: { grid: { display: false } }
+    }
+  },
+  topProducts: {
+    responsive: true,
+    maintainAspectRatio: false,
+    indexAxis: 'y',
+    plugins: { legend: { display: false } },
+    scales: {
+      x: {
+        beginAtZero: true,
+        grid: { color: 'rgba(0,0,0,0.05)' }
+      },
+      y: { grid: { display: false } }
+    }
+  }
+}
 
 async function openOrderDetail(id) {
   detail.value = { open: true, loading: true, error: '', data: null }

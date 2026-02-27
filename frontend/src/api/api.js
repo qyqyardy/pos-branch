@@ -170,4 +170,10 @@ export async function deleteLedgerEntry(token, id) {
     token
   })
 }
+export async function getSalesAnalytics(token) {
+  return request('/api/analytics/sales', { token })
+}
 
+export async function getTopProducts(token) {
+  return request('/api/analytics/top-products', { token })
+}
