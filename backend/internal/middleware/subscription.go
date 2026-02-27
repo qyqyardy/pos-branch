@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
@@ -79,8 +80,15 @@ func RequireSubscription(db *sql.DB, opts SubscriptionOptions) func(http.Handler
 		requiredPlan = ""
 	}
 
+	bypass := os.Getenv("SUBSCRIPTION_BYPASS") == "true"
+
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			if bypass {
+				next.ServeHTTP(w, r)
+				return
+			}
+
 			plan, paidUntil, active, err := loadSubscription(db)
 			if err != nil {
 				http.Error(w, "Server error", 500)
