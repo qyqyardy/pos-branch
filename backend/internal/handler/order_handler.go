@@ -93,6 +93,10 @@ func (h *OrderHandler) ListOrders(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Optimization: Use date range instead of ::date to allow standard index usage
+	start := date + " 00:00:00"
+	end := date + " 23:59:59.999"
+
 	rows, err := h.Service.OrderRepo.DB.Query(
 		`SELECT o.id, o.total, o.created_at,
 		        o.order_type, o.table_no, o.guest_count, o.customer_name,
@@ -100,9 +104,9 @@ func (h *OrderHandler) ListOrders(w http.ResponseWriter, r *http.Request) {
 		        u.id, u.name, u.email
 		   FROM orders o
 		   LEFT JOIN users u ON u.id = o.cashier_id
-		  WHERE o.created_at::date = $1::date
+		  WHERE o.created_at >= $1 AND o.created_at <= $2
 		  ORDER BY o.created_at DESC`,
-		date,
+		start, end,
 	)
 	if err != nil {
 		http.Error(w, "Server error", 500)
