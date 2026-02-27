@@ -118,12 +118,13 @@
 
 	            <div class="mb-3 overflow-hidden rounded-xl border border-black/10 bg-white/50">
 	              <img
-	                :src="menuImageFor(p.name)"
+	                :src="p.image_data_url || menuImageFor(p.name)"
 	                alt=""
 	                class="h-24 w-full object-cover"
 	                loading="lazy"
 	                @error="onMenuImgError"
 	              />
+
 	            </div>
 
 	            <div class="min-h-[2.75rem] font-semibold leading-snug">
@@ -281,32 +282,45 @@
           </button>
         </div>
 
-	        <div class="mt-4 grid grid-cols-2 gap-2">
+	        <div class="mt-4 grid grid-cols-3 gap-2">
 	          <button
 	            type="button"
-	            class="rounded-xl border px-4 py-2 text-sm font-semibold transition"
-            :class="
-              payMethod === 'cash'
-                ? 'border-black/15 bg-white shadow-[0_10px_25px_rgba(0,0,0,0.10)]'
-                : 'border-black/10 bg-white/60 hover:bg-white/80'
-            "
-            @click="payMethod = 'cash'"
-          >
-            Cash
-          </button>
-          <button
-            type="button"
-            class="rounded-xl border px-4 py-2 text-sm font-semibold transition"
-            :class="
-              payMethod === 'qris'
-                ? 'border-black/15 bg-white shadow-[0_10px_25px_rgba(0,0,0,0.10)]'
-                : 'border-black/10 bg-white/60 hover:bg-white/80'
-            "
-            @click="payMethod = 'qris'"
-          >
-            QRIS
+	            class="rounded-xl border px-2 py-2 text-xs font-semibold transition"
+	            :class="
+	              payMethod === 'cash'
+	                ? 'border-black/15 bg-white shadow-[0_10px_25px_rgba(0,0,0,0.10)]'
+	                : 'border-black/10 bg-white/60 hover:bg-white/80'
+	            "
+	            @click="payMethod = 'cash'"
+	          >
+	            Cash
+	          </button>
+	          <button
+	            type="button"
+	            class="rounded-xl border px-2 py-2 text-xs font-semibold transition"
+	            :class="
+	              payMethod === 'qris'
+	                ? 'border-black/15 bg-white shadow-[0_10px_25px_rgba(0,0,0,0.10)]'
+	                : 'border-black/10 bg-white/60 hover:bg-white/80'
+	            "
+	            @click="payMethod = 'qris'"
+	          >
+	            QRIS
+	          </button>
+	          <button
+	            type="button"
+	            class="rounded-xl border px-2 py-2 text-xs font-semibold transition text-blue-600"
+	            :class="
+	              payMethod === 'midtrans'
+	                ? 'border-black/15 bg-white shadow-[0_10px_25px_rgba(0,0,0,0.10)]'
+	                : 'border-black/10 bg-white/60 hover:bg-white/80'
+	            "
+	            @click="payMethod = 'midtrans'"
+	          >
+	            Midtrans
 	          </button>
 	        </div>
+
 
 	        <div class="mt-4 rounded-2xl border border-black/10 bg-white/70 p-4">
 	          <div class="text-sm font-semibold">Detail pesanan</div>
@@ -396,6 +410,16 @@
             >
               {{ change == null ? '-' : formatIDR(change) }}
             </div>
+          </div>
+        </div>
+
+        <div
+          v-else-if="payMethod === 'midtrans'"
+          class="mt-4 rounded-2xl border border-black/10 bg-white/70 p-4"
+        >
+          <div class="text-sm font-semibold text-blue-600">Midtrans Snap</div>
+          <div class="mt-1 text-sm text-[color:var(--muted)]">
+            Popup pembayaran akan muncul setelah Anda klik konfirmasi.
           </div>
         </div>
 
@@ -1128,9 +1152,20 @@ function showToast(type, message) {
 	    return
 	  }
 
+	  // Load Midtrans Snap script
+	  const snapScript = 'https://app.sandbox.midtrans.com/snap/snap.js'
+	  const clientKey = 'SB-Mid-client-XXXXX' // Should be from config
+	  if (!document.querySelector(`script[src="${snapScript}"]`)) {
+	    const script = document.createElement('script')
+	    script.src = snapScript
+	    script.setAttribute('data-client-key', clientKey)
+	    document.head.appendChild(script)
+	  }
+
 	  await settings.loadStore(auth.token)
 	  await loadProducts()
 	})
+
 
 const filteredProducts = computed(() => {
   const q = search.value.trim().toLowerCase()
@@ -1285,27 +1320,34 @@ function handleLogout() {
 	        ? snapshotReceived - finalTotal
 	        : null
 
-	    showToast('success', 'Transaksi tersimpan')
-	    lastOrder.value = {
-	      orderId,
-	      orderNo,
-	      paidAt: snapshotTime,
-	      items: snapshotItems,
-	      total: finalTotal,
-	      payMethod: payMethod.value,
-	      received: snapshotReceived,
-	      change: finalChange,
-		      customerName: snapshotCustomer,
-		      tableNo: snapshotTable,
-		      guestCount: snapshotGuests,
-		      orderType: snapshotOrderType,
-		      cashierName: snapshotCashier
-		    }
+	    const paymentStatus = res?.payment_status
+	    const paymentToken = res?.payment_token
 
-	    cart.value = []
-	    isPayOpen.value = false
-	    cashReceived.value = ''
-	    isDoneOpen.value = true
+	    isPayOpen.value = false // Close pay modal immediately
+
+	    if (paymentToken && window.snap) {
+	      window.snap.pay(paymentToken, {
+	        onSuccess: function (result) {
+	          showToast('success', 'Pembayaran berhasil!')
+	          finishOrder(orderId, orderNo, snapshotTime, snapshotItems, finalTotal, finalChange, snapshotCustomer, snapshotTable, snapshotGuests, snapshotOrderType, snapshotCashier, snapshotReceived)
+	        },
+	        onPending: function (result) {
+	          showToast('success', 'Transaksi tertunda, silakan selesaikan pembayaran.')
+	          finishOrder(orderId, orderNo, snapshotTime, snapshotItems, finalTotal, finalChange, snapshotCustomer, snapshotTable, snapshotGuests, snapshotOrderType, snapshotCashier, snapshotReceived)
+	        },
+	        onError: function (result) {
+	          showToast('error', 'Pembayaran gagal.')
+	          submitting.value = false
+	        },
+	        onClose: function () {
+	          showToast('error', 'Anda menutup layar pembayaran sebelum selesai.')
+	          submitting.value = false
+	        }
+	      })
+	    } else {
+	      showToast('success', 'Transaksi tersimpan')
+	      finishOrder(orderId, orderNo, snapshotTime, snapshotItems, finalTotal, finalChange, snapshotCustomer, snapshotTable, snapshotGuests, snapshotOrderType, snapshotCashier, snapshotReceived)
+	    }
 	  } catch (e) {
 	    if (e instanceof ApiError && e.status === 401) {
 	      auth.logout()
@@ -1317,8 +1359,33 @@ function handleLogout() {
 	      return
 	    }
 	    showToast('error', e?.message || 'Checkout gagal')
-	  } finally {
 	    submitting.value = false
+	  } finally {
+	    // submitting is handled in finishOrder or callback
 	  }
 	}
+
+	function finishOrder(orderId, orderNo, snapshotTime, snapshotItems, finalTotal, finalChange, snapshotCustomer, snapshotTable, snapshotGuests, snapshotOrderType, snapshotCashier, snapshotReceived) {
+	  lastOrder.value = {
+	    orderId,
+	    orderNo,
+	    paidAt: snapshotTime,
+	    items: snapshotItems,
+	    total: finalTotal,
+	    payMethod: payMethod.value,
+	    received: snapshotReceived,
+	    change: finalChange,
+	    customerName: snapshotCustomer,
+	    tableNo: snapshotTable,
+	    guestCount: snapshotGuests,
+	    orderType: snapshotOrderType,
+	    cashierName: snapshotCashier
+	  }
+
+	  cart.value = []
+	  cashReceived.value = ''
+	  isDoneOpen.value = true
+	  submitting.value = false
+	}
+
 </script>

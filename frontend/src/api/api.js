@@ -67,6 +67,30 @@ export async function getProducts(token) {
   return request('/api/products', { token })
 }
 
+export async function createProduct(token, payload) {
+  return request('/api/admin/products', {
+    method: 'POST',
+    token,
+    body: payload
+  })
+}
+
+export async function updateProduct(token, id, payload) {
+  return request(`/api/admin/products/${id}`, {
+    method: 'PUT',
+    token,
+    body: payload
+  })
+}
+
+export async function deleteProduct(token, id) {
+  return request(`/api/admin/products/${id}`, {
+    method: 'DELETE',
+    token
+  })
+}
+
+
 export async function createOrder(token, payload) {
   return request('/api/orders', {
     method: 'POST',
@@ -146,3 +170,4 @@ export async function deleteLedgerEntry(token, id) {
     token
   })
 }
+

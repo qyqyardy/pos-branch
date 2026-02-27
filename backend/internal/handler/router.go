@@ -50,7 +50,10 @@ func SetupRoutes(db *sql.DB) http.Handler {
 	admin := api.PathPrefix("/admin").Subrouter()
 	admin.Use(middleware.RequireRoles("admin"))
 	admin.HandleFunc("/products", product.CreateProduct).Methods("POST", "OPTIONS")
+	admin.HandleFunc("/products/{id}", product.UpdateProduct).Methods("PUT", "OPTIONS")
+	admin.HandleFunc("/products/{id}", product.DeleteProduct).Methods("DELETE", "OPTIONS")
 	admin.HandleFunc("/users", userAdmin.ListUsers).Methods("GET", "OPTIONS")
+
 	admin.HandleFunc("/users", userAdmin.CreateUser).Methods("POST", "OPTIONS")
 	admin.HandleFunc("/users/{id}", userAdmin.UpdateUser).Methods("PATCH", "OPTIONS")
 	admin.HandleFunc("/users/{id}", userAdmin.DeleteUser).Methods("DELETE", "OPTIONS")
@@ -88,6 +91,8 @@ func SetupRoutes(db *sql.DB) http.Handler {
 			middleware.RequireRoles("admin", "finance")(http.HandlerFunc(ledger.Delete)),
 		),
 	).Methods("DELETE", "OPTIONS")
+
+	r.HandleFunc("/api/webhooks/midtrans", order.MidtransWebhook).Methods("POST", "OPTIONS")
 
 	return r
 }

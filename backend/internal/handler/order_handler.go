@@ -7,12 +7,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/google/uuid"
-	"github.com/gorilla/mux"
 	"pos-backend/internal/middleware"
 	"pos-backend/internal/model"
 	"pos-backend/internal/repository"
 	"pos-backend/internal/service"
+
+	"github.com/google/uuid"
+	"github.com/gorilla/mux"
 )
 
 type OrderHandler struct {
@@ -42,7 +43,6 @@ func (h *OrderHandler) CreateOrder(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Token might still be valid while the user row is gone (e.g. DB reset).
 	userRepo := repository.UserRepo{DB: h.Service.OrderRepo.DB}
 	exists, err := userRepo.ExistsByID(userID)
 	if err != nil {
@@ -66,12 +66,21 @@ func (h *OrderHandler) CreateOrder(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(201)
-	json.NewEncoder(w).Encode(map[string]any{
+	resp := map[string]any{
 		"order_id": orderID.String(),
 		"total":    total,
-	})
+	}
+
+	// Fetch saved payment info
+	saved, err := h.Service.OrderRepo.GetByID(orderID)
+	if err == nil {
+		resp["payment_status"] = saved.PaymentStatus
+		resp["payment_token"] = saved.PaymentToken
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(201)
+	json.NewEncoder(w).Encode(resp)
 }
 
 func (h *OrderHandler) ListOrders(w http.ResponseWriter, r *http.Request) {
@@ -269,6 +278,48 @@ func (h *OrderHandler) GetOrder(w http.ResponseWriter, r *http.Request) {
 		},
 		"items": items,
 	})
+}
+
+func (h *OrderHandler) MidtransWebhook(w http.ResponseWriter, r *http.Request) {
+	var notification struct {
+		OrderID           string `json:"order_id"`
+		TransactionStatus string `json:"transaction_status"`
+		FraudStatus       string `json:"fraud_status"`
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&notification); err != nil {
+		http.Error(w, "Invalid notification body", 400)
+		return
+	}
+
+	orderID, err := uuid.Parse(notification.OrderID)
+	if err != nil {
+		parts := strings.Split(notification.OrderID, "-")
+		if len(parts) > 1 {
+			orderID, err = uuid.Parse(parts[len(parts)-1])
+		}
+	}
+
+	if err != nil {
+		w.WriteHeader(200)
+		return
+	}
+
+	status := "pending"
+	if notification.TransactionStatus == "capture" || notification.TransactionStatus == "settlement" {
+		if notification.FraudStatus == "accept" || notification.FraudStatus == "" {
+			status = "completed"
+		}
+	} else if notification.TransactionStatus == "deny" || notification.TransactionStatus == "expire" || notification.TransactionStatus == "cancel" {
+		status = "failed"
+	}
+
+	if err := h.Service.OrderRepo.UpdateStatus(orderID, status); err != nil {
+		http.Error(w, "Failed to update order status", 500)
+		return
+	}
+
+	w.WriteHeader(200)
 }
 
 func nullIfBlank(s string) any {
