@@ -678,7 +678,7 @@ function closeOrders() {
 }
 
 async function loadRecentOrders() {
-  ordersLoading.value = true
+  if (orders.value.length === 0) ordersLoading.value = true
   ordersError.value = ''
   try {
     const date = new Date().toISOString().split('T')[0]
@@ -1297,8 +1297,8 @@ function showToast(type, message) {
 	  await loadProducts()
 	  await loadRecentOrders()
 
-	  // Polling kitchen status every 15s
-	  ordersInterval = setInterval(loadRecentOrders, 15000)
+	  // Polling kitchen status every 5s
+	  ordersInterval = setInterval(loadRecentOrders, 5000)
 	})
 
   import { onUnmounted } from 'vue'
