@@ -50,28 +50,35 @@ Copy `.env.example` menjadi `.env` dan sesuaikan nilainya.
 - `MIDTRANS_SERVER_KEY`: Server key dari Dashboard Midtrans.
 - `MIDTRANS_CLIENT_KEY`: Client key dari Dashboard Midtrans.
 
-## Quick Start (Docker)
+## Cara Menjalankan (Docker - Decoupled)
 
-```bash
-docker compose up -d --build
-```
+Sistem sekarang menggunakan arsitektur terpisah untuk keamanan data:
 
-Buka:
-- Frontend: `http://localhost:3000`
-- Backend: `http://localhost:8080`
-- Default Admin: `admin@pos.com` / `123456`
+1. **Jalankan Database (Infra)**
+   ```bash
+   docker compose -f docker-compose.infra.yml up -d
+   ```
+   *Biarkan ini menyala terus agar data tetap aman.*
+
+2. **Jalankan Aplikasi (Backend & Frontend)**
+   ```bash
+   docker compose -f docker-compose.app.yml up --build -d
+   ```
+   *Gunakan ini jika ada perubahan kode atau ingin restart aplikasi.*
+
+3. **Matikan Aplikasi (Tanpa matikan DB)**
+   ```bash
+   docker compose -f docker-compose.app.yml down
+   ```
+
+*Catatan: Gunakan `docker-compose.yml` (default) jika ingin menjalankan semuanya dalam satu lifecycle (resiko data hilang jika `down -v`).*
 
 ## Database & Migrations
 
-File migration baru:
-- `006_product_images.sql`: Dukungan upload foto produk.
-- `007_midtrans_support.sql`: Kolom status & token pembayaran Midtrans.
-- `008_product_active_status.sql`: Fitur enable/disable produk (stok kosong).
-
-Gunakan script berikut jika DB sudah ada datanya:
-```bash
-./scripts/db_apply_migrations.sh
-```
+Aplikasi menggunakan **Automated Migrations** di dalam kode Go. 
+- Tidak perlu lagi menjalankan script migrasi manual.
+- Backend akan otomatis mengecek dan melakukan migrasi tabel saat pertama kali dijalankan.
+- Pastikan folder `migrations/` ada di root project.
 
 ## Receipt & Kitchen Printing
 
