@@ -164,10 +164,22 @@
 	      </section>
 
       <section class="rounded-2xl border border-black/10 bg-[color:var(--paper)] backdrop-blur shadow-[0_18px_60px_rgba(0,0,0,0.10)]">
-        <div class="px-5 py-4">
-          <div class="font-brand text-xl">Transaksi</div>
-          <div class="mt-1 text-sm text-[color:var(--muted)]">
-            Daftar order di tanggal terpilih.
+        <div class="flex flex-wrap items-center justify-between gap-4 px-5 py-4">
+          <div>
+            <div class="font-brand text-xl">Transaksi</div>
+            <div class="mt-1 text-sm text-[color:var(--muted)]">
+              Daftar order di tanggal terpilih.
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <div class="relative">
+              <input
+                v-model="orderSearch"
+                type="search"
+                placeholder="Cari Order #..."
+                class="w-48 rounded-xl border border-black/10 bg-white px-3 py-2 text-xs outline-none focus:border-black/20 focus:shadow-[0_0_0_4px_rgba(193,122,59,0.15)]"
+              />
+            </div>
           </div>
         </div>
 
@@ -192,7 +204,7 @@
               </thead>
               <tbody>
                 <tr
-                  v-for="o in orders"
+                  v-for="o in filteredOrders"
                   :key="o.id"
                   class="border-t border-black/10"
                 >
@@ -477,6 +489,7 @@ const loading = ref(false)
 const error = ref('')
 
 const orders = ref([])
+const orderSearch = ref('')
 const ledger = ref([])
 
 const OPENING_LS_KEY = 'finance_opening_by_date_v1'
@@ -596,6 +609,16 @@ async function loadAll() {
     loading.value = false
   }
 }
+
+const filteredOrders = computed(() => {
+  const q = orderSearch.value.trim().toLowerCase()
+  if (!q) return orders.value
+  return orders.value.filter(o => {
+    const orderNo = orderNoFromId(o.id).toLowerCase()
+    const orderId = String(o.id || '').toLowerCase()
+    return orderNo.includes(q) || orderId.includes(q)
+  })
+})
 
 const summary = computed(() => {
   const salesTotal = orders.value.reduce((s, o) => s + Number(o?.total || 0), 0)
