@@ -7,4 +7,5 @@ type Product struct {
 	Name         string    `json:"name"`
 	Price        int64     `json:"price"`
 	ImageDataURL string    `json:"image_data_url"`
+	IsActive     bool      `json:"is_active"`
 }

@@ -1169,8 +1169,11 @@ function showToast(type, message) {
 
 const filteredProducts = computed(() => {
   const q = search.value.trim().toLowerCase()
-  if (!q) return products.value
-  return products.value.filter(p => String(p?.name || '').toLowerCase().includes(q))
+  return products.value.filter(p => {
+    if (p.is_active === false) return false
+    if (!q) return true
+    return String(p?.name || '').toLowerCase().includes(q)
+  })
 })
 
 function addToCart(product) {

@@ -36,6 +36,15 @@
         </button>
 
         <button
+          v-if="canProducts"
+          type="button"
+          class="rounded-xl border border-black/10 bg-white/70 px-3 py-2 text-sm font-semibold hover:bg-white"
+          @click="go('/products')"
+        >
+          Produk
+        </button>
+
+        <button
           v-if="canFinance"
           type="button"
           class="rounded-xl border border-black/10 bg-white/70 px-3 py-2 text-sm font-semibold hover:bg-white"
@@ -78,6 +87,7 @@ const settings = useSettingsStore()
 const role = computed(() => auth.user?.role || '')
 const plan = computed(() => settings.store?.plan || 'premium')
 const canSettings = computed(() => role.value === 'admin')
+const canProducts = computed(() => role.value === 'admin')
 const canFinance = computed(
   () => (role.value === 'admin' || role.value === 'finance') && plan.value === 'premium'
 )

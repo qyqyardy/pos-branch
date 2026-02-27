@@ -4,8 +4,10 @@ POS kasir sederhana untuk warkop/cafe: POS + cetak struk & kitchen ticket + dash
 
 ## Fitur Unggulan Baru 🚀
 
-- **Manajemen Produk & Gambar**: Upload foto menu langsung dari browser.
+- **Dashboard Produk Terpisah**: Manajemen menu lebih rapi dan lapang di dashboard khusus.
+- **Enable/Disable Menu**: Sembunyikan produk dari POS secara instan jika stok sedang kosong.
 - **Integrasi Midtrans (QRIS Dinamis)**: Pembayaran otomatis via Midtrans Snap (QRIS, VA, dsb). Tidak perlu input nominal manual saat scan.
+- **Pencarian Transaksi**: Cari order berdasarkan ID atau Nomor Antrian di halaman Finance.
 - **Webhook Status**: Status pesanan otomatis berubah jadi 'Lunas' saat pembayaran Midtrans berhasil.
 
 ## Fitur Utama
@@ -15,11 +17,14 @@ POS kasir sederhana untuk warkop/cafe: POS + cetak struk & kitchen ticket + dash
   - Pembayaran Cash / QRIS (Manual) / **Midtrans (Otomatis)**.
   - Dine In / Take Away, input meja, jumlah tamu, nama pemesan.
   - Cetak Struk customer & Ticket kitchen.
+- **Produk (Dashboard Khusus)**
+  - Tambah/Edit/Hapus menu + foto.
+  - **Status Stok**: Aktifkan/Matikan menu (Disable menu jika kosong).
 - **Setting (Admin)**
   - Profil toko & Upload logo.
-  - **Manajemen Produk**: Tambah/Edit/Hapus menu + foto.
   - Manajemen user: cashier, finance, admin (superadmin).
 - **Finance (Admin/Finance)**
+  - **Pencarian Order**: Cari transaksi berdasarkan ID / No Order.
   - Trace transaksi harian + detail order.
   - Pembukuan manual (income/expense).
   - Neraca harian sederhana.
@@ -61,6 +66,7 @@ Buka:
 File migration baru:
 - `006_product_images.sql`: Dukungan upload foto produk.
 - `007_midtrans_support.sql`: Kolom status & token pembayaran Midtrans.
+- `008_product_active_status.sql`: Fitur enable/disable produk (stok kosong).
 
 Gunakan script berikut jika DB sudah ada datanya:
 ```bash

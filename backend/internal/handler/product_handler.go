@@ -26,6 +26,7 @@ func (h *ProductHandler) CreateProduct(w http.ResponseWriter, r *http.Request) {
 		Name         string `json:"name"`
 		Price        int64  `json:"price"`
 		ImageDataURL string `json:"image_data_url"`
+		IsActive     *bool  `json:"is_active"`
 	}
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -39,8 +40,13 @@ func (h *ProductHandler) CreateProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	isActive := true
+	if req.IsActive != nil {
+		isActive = *req.IsActive
+	}
+
 	repo := repository.ProductRepo{DB: h.DB}
-	err := repo.Create(req.Name, req.Price, req.ImageDataURL)
+	err := repo.Create(req.Name, req.Price, req.ImageDataURL, isActive)
 	if err != nil {
 		http.Error(w, err.Error(), 400)
 		return
@@ -62,6 +68,7 @@ func (h *ProductHandler) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 		Name         string `json:"name"`
 		Price        int64  `json:"price"`
 		ImageDataURL string `json:"image_data_url"`
+		IsActive     *bool  `json:"is_active"`
 	}
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -75,8 +82,13 @@ func (h *ProductHandler) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	isActive := true
+	if req.IsActive != nil {
+		isActive = *req.IsActive
+	}
+
 	repo := repository.ProductRepo{DB: h.DB}
-	err = repo.Update(id, req.Name, req.Price, req.ImageDataURL)
+	err = repo.Update(id, req.Name, req.Price, req.ImageDataURL, isActive)
 	if err != nil {
 		http.Error(w, err.Error(), 400)
 		return

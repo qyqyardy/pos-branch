@@ -147,93 +147,6 @@
         </div>
       </section>
 
-      <section class="rounded-2xl border border-black/10 bg-[color:var(--paper)] backdrop-blur shadow-[0_18px_60px_rgba(0,0,0,0.10)]">
-        <div class="flex items-start justify-between gap-4 px-5 py-4">
-          <div>
-            <div class="font-brand text-xl">Produk (Menu)</div>
-            <div class="mt-1 text-sm text-[color:var(--muted)]">
-              Atur daftar makanan dan minuman.
-            </div>
-          </div>
-          <button
-            type="button"
-            class="rounded-xl border border-black/10 bg-white/70 px-4 py-2 text-sm font-semibold hover:bg-white"
-            @click="openCreateProduct"
-          >
-            Tambah produk
-          </button>
-        </div>
-
-        <div class="border-t border-black/10 px-5 py-5">
-          <div v-if="productsLoading" class="text-sm text-[color:var(--muted)]">
-            Memuat produk...
-          </div>
-
-          <div v-else-if="productsError" class="rounded-xl border border-black/10 bg-white/70 p-4">
-            <div class="font-semibold">Gagal memuat produk</div>
-            <div class="mt-1 text-sm text-[color:var(--muted)]">{{ productsError }}</div>
-            <button
-              type="button"
-              class="mt-4 rounded-xl border border-black/10 bg-white/70 px-4 py-2 text-sm font-semibold hover:bg-white"
-              @click="loadProducts"
-            >
-              Coba lagi
-            </button>
-          </div>
-
-          <div v-else class="overflow-auto">
-            <table class="w-full min-w-[720px] text-left text-sm">
-              <thead class="text-xs tracking-widest uppercase text-[color:var(--muted)]">
-                <tr>
-                  <th class="py-2" width="80">Gambar</th>
-                  <th class="py-2">Nama</th>
-                  <th class="py-2">Harga</th>
-                  <th class="py-2 text-right">Aksi</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr
-                  v-for="p in products"
-                  :key="p.id"
-                  class="border-t border-black/10"
-                >
-                  <td class="py-3">
-                    <div class="h-12 w-12 overflow-hidden rounded-xl border border-black/10 bg-white">
-                      <img
-                        :src="p.image_data_url || '/menu/_default.svg'"
-                        alt=""
-                        class="h-full w-full object-cover"
-                      />
-                    </div>
-                  </td>
-                  <td class="py-3">
-                    <div class="font-semibold">{{ p.name }}</div>
-                  </td>
-                  <td class="py-3 font-mono text-xs">{{ formatIDR(p.price) }}</td>
-                  <td class="py-3 text-right">
-                    <div class="flex justify-end gap-2">
-                      <button
-                        type="button"
-                        class="rounded-xl border border-black/10 bg-white/70 px-3 py-2 text-xs font-semibold hover:bg-white"
-                        @click="openEditProduct(p)"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        type="button"
-                        class="rounded-xl px-3 py-2 text-xs font-semibold text-[color:var(--danger)] hover:bg-red-50"
-                        @click="confirmDeleteProduct(p)"
-                      >
-                        Hapus
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
 
       <section class="rounded-2xl border border-black/10 bg-[color:var(--paper)] backdrop-blur shadow-[0_18px_60px_rgba(0,0,0,0.10)]">
         <div class="flex items-start justify-between gap-4 px-5 py-4">
@@ -328,99 +241,6 @@
       </section>
     </main>
 
-    <div
-      v-if="productModal.open"
-      class="fixed inset-0 z-50 flex items-end justify-center p-4 sm:items-center"
-    >
-      <div class="absolute inset-0 bg-black/35" @click="closeProductModal" />
-      <div
-        class="relative w-full max-w-lg animate-float-in rounded-2xl border border-black/10 bg-[color:var(--paper-strong)] backdrop-blur p-5 shadow-[0_24px_80px_rgba(0,0,0,0.18)]"
-      >
-        <div class="flex items-start justify-between gap-3">
-          <div>
-            <div class="text-xs tracking-widest uppercase text-[color:var(--muted)]">
-              {{ productModal.mode === 'create' ? 'Tambah produk' : 'Edit produk' }}
-            </div>
-            <div class="mt-1 font-brand text-2xl">
-              {{ productModal.mode === 'create' ? 'Produk baru' : 'Perbarui produk' }}
-            </div>
-          </div>
-          <button
-            type="button"
-            class="rounded-xl border border-black/10 bg-white/70 px-3 py-2 text-sm font-semibold hover:bg-white"
-            @click="closeProductModal"
-          >
-            Tutup
-          </button>
-        </div>
-
-        <div class="mt-4 grid grid-cols-1 gap-3">
-          <div class="rounded-2xl border border-black/10 bg-white/70 p-4">
-            <div class="text-sm font-semibold">Gambar Produk</div>
-            <div class="mt-3 flex items-center gap-4">
-              <div class="h-20 w-20 overflow-hidden rounded-2xl border border-black/10 bg-white flex items-center justify-center">
-                <img
-                  v-if="productModal.imgPreview"
-                  :src="productModal.imgPreview"
-                  alt=""
-                  class="h-full w-full object-cover"
-                />
-                <div v-else class="text-xs text-[color:var(--muted)]">No image</div>
-              </div>
-              <div class="flex-1">
-                <input
-                  type="file"
-                  accept="image/*"
-                  class="block w-full text-xs"
-                  @change="onPickProductImg"
-                />
-                <button
-                  v-if="productModal.imgPreview"
-                  type="button"
-                  class="mt-2 text-xs font-semibold text-[color:var(--danger)]"
-                  @click="productModal.imgPreview = ''"
-                >
-                  Hapus gambar
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <label class="block">
-            <span class="text-sm font-medium">Nama Produk</span>
-            <input
-              v-model.trim="productModal.form.name"
-              class="mt-1 w-full rounded-xl border border-black/10 bg-white px-4 py-3 text-sm outline-none focus:border-black/20 focus:shadow-[0_0_0_4px_rgba(193,122,59,0.15)]"
-              placeholder="Contoh: Kopi Susu"
-            />
-          </label>
-
-          <label class="block">
-            <span class="text-sm font-medium">Harga (IDR)</span>
-            <input
-              v-model.number="productModal.form.price"
-              type="number"
-              class="mt-1 w-full rounded-xl border border-black/10 bg-white px-4 py-3 text-sm outline-none focus:border-black/20 focus:shadow-[0_0_0_4px_rgba(193,122,59,0.15)]"
-              placeholder="15000"
-            />
-          </label>
-        </div>
-
-        <p v-if="productModal.error" class="mt-3 text-sm text-red-700">
-          {{ productModal.error }}
-        </p>
-
-        <button
-          type="button"
-          class="mt-4 w-full rounded-xl bg-[color:var(--accent)] px-4 py-3 font-semibold text-white shadow-[0_14px_30px_rgba(193,122,59,0.35)] transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-60"
-          :disabled="productModal.submitting"
-          @click="submitProductModal"
-        >
-          <span v-if="!productModal.submitting">Simpan</span>
-          <span v-else>Memproses...</span>
-        </button>
-      </div>
-    </div>
 
     <div
       v-if="userModal.open"
@@ -542,7 +362,7 @@ import { useRouter } from 'vue-router'
 import TopBar from '../components/TopBar.vue'
 import { useAuthStore } from '../stores/auth'
 import { useSettingsStore } from '../stores/settings'
-import { ApiError, createProduct, createUser, deleteProduct, getProducts, listUsers, updateProduct, updateUser } from '../api/api'
+import { ApiError, createUser, deleteUser, listUsers, updateUser } from '../api/api'
 
 
 const router = useRouter()
@@ -566,10 +386,6 @@ const logoError = ref('')
 const users = ref([])
 const usersLoading = ref(false)
 const usersError = ref('')
-
-const products = ref([])
-const productsLoading = ref(false)
-const productsError = ref('')
 
 function formatIDR(val) {
   return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(val || 0)
@@ -928,7 +744,6 @@ onMounted(async () => {
   await settings.loadStore(auth.token)
   syncStoreForm()
   await loadUsers()
-  await loadProducts()
 })
 
 </script>
