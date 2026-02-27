@@ -4,8 +4,8 @@ POS kasir sederhana untuk warkop/cafe: POS + cetak struk & kitchen ticket + dash
 
 ## Fitur Unggulan Baru 🚀
 
-- **Dashboard Produk Terpisah**: Manajemen menu lebih rapi dan lapang di dashboard khusus.
-- **Enable/Disable Menu**: Sembunyikan produk dari POS secara instan jika stok sedang kosong.
+- **Dashboard Khusus Produk**: Manajemen menu lebih rapi dan lapang di dashboard khusus.
+- **Tersedia/Habis (Stok)**: Sembunyikan produk dari POS secara instan jika stok sedang kosong.
 - **Integrasi Midtrans (QRIS Dinamis)**: Pembayaran otomatis via Midtrans Snap (QRIS, VA, dsb). Tidak perlu input nominal manual saat scan.
 - **Pencarian Transaksi**: Cari order berdasarkan ID atau Nomor Antrian di halaman Finance.
 - **Webhook Status**: Status pesanan otomatis berubah jadi 'Lunas' saat pembayaran Midtrans berhasil.
@@ -32,7 +32,7 @@ POS kasir sederhana untuk warkop/cafe: POS + cetak struk & kitchen ticket + dash
 ## Roles (Akses)
 
 - `cashier`: hanya POS, bisa buat order.
-- `finance`: hanya Finance, akses laporan dan pembukuan.
+- `finance`: akses menu Finance, laporan, dan pembukuan.
 - `admin`: akses semua fitur (POS + Finance + Setting + Users + Products).
 
 ## Tech Stack

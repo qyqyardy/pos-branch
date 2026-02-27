@@ -23,35 +23,6 @@
         </div>
 
         <div class="border-t border-black/10 px-5 py-5">
-          <div class="mb-5 rounded-2xl border border-black/10 bg-white/70 p-4">
-            <div class="text-sm font-semibold">Subscription</div>
-            <div class="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
-              <div>
-                <div class="text-xs tracking-widest uppercase text-[color:var(--muted)]">Plan</div>
-                <div class="mt-1 font-semibold">
-                  {{ planLabel(settings.store?.plan) }}
-                </div>
-              </div>
-              <div>
-                <div class="text-xs tracking-widest uppercase text-[color:var(--muted)]">Berlaku sampai</div>
-                <div class="mt-1 font-mono text-xs">
-                  {{ formatPaidUntil(settings.store?.paid_until) }}
-                </div>
-              </div>
-              <div>
-                <div class="text-xs tracking-widest uppercase text-[color:var(--muted)]">Status</div>
-                <div
-                  class="mt-1 font-semibold"
-                  :class="settings.store?.subscription_active === false ? 'text-red-700' : 'text-emerald-700'"
-                >
-                  {{ settings.store?.subscription_active === false ? 'Expired' : 'Active' }}
-                </div>
-              </div>
-            </div>
-            <div class="mt-3 text-xs text-[color:var(--muted)]">
-              Plan dan masa aktif diatur oleh vendor.
-            </div>
-          </div>
 
           <div class="mb-5 rounded-2xl border border-black/10 bg-white/70 p-4">
             <div class="text-sm font-semibold">Logo</div>
@@ -297,12 +268,9 @@
               class="mt-1 w-full rounded-xl border border-black/10 bg-white px-4 py-3 text-sm outline-none focus:border-black/20 focus:shadow-[0_0_0_4px_rgba(193,122,59,0.15)]"
             >
               <option value="cashier">Kasir</option>
-              <option value="finance" :disabled="!isPremium">Finance (Premium)</option>
+              <option value="finance">Finance</option>
               <option value="admin">Superadmin</option>
             </select>
-            <div v-if="!isPremium" class="mt-2 text-xs text-[color:var(--muted)]">
-              Role Finance hanya tersedia untuk plan Premium.
-            </div>
           </label>
 
           <label class="block">
@@ -368,7 +336,6 @@ import { ApiError, createUser, deleteUser, listUsers, updateUser } from '../api/
 const router = useRouter()
 const auth = useAuthStore()
 const settings = useSettingsStore()
-const isPremium = computed(() => (settings.store?.plan || 'premium') === 'premium')
 
 const storeForm = ref({
   name: '',
@@ -531,19 +498,6 @@ function roleLabel(role) {
   return 'Kasir'
 }
 
-function planLabel(plan) {
-  return String(plan || '').toLowerCase() === 'standard' ? 'Standard' : 'Premium'
-}
-
-function formatPaidUntil(iso) {
-  if (!iso) return '-'
-  try {
-    const d = new Date(iso)
-    return d.toLocaleDateString('id-ID', { year: 'numeric', month: 'short', day: '2-digit' })
-  } catch {
-    return String(iso)
-  }
-}
 
 function formatDate(d) {
   try {

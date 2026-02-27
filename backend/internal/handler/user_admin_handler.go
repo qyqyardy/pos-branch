@@ -93,17 +93,6 @@ func (h *UserAdminHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid role", 400)
 		return
 	}
-	if role == "finance" {
-		s, err := h.StoreRepo.Get()
-		if err != nil && err != sql.ErrNoRows {
-			http.Error(w, "Server error", 500)
-			return
-		}
-		if s != nil && strings.ToLower(strings.TrimSpace(s.Plan)) != "premium" {
-			http.Error(w, "Role finance butuh plan Premium", 402)
-			return
-		}
-	}
 
 	hash, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	if err != nil {
@@ -166,17 +155,6 @@ func (h *UserAdminHandler) UpdateUser(w http.ResponseWriter, r *http.Request) {
 		if !isValidRole(newRole) {
 			http.Error(w, "Invalid role", 400)
 			return
-		}
-		if newRole == "finance" {
-			s, err := h.StoreRepo.Get()
-			if err != nil && err != sql.ErrNoRows {
-				http.Error(w, "Server error", 500)
-				return
-			}
-			if s != nil && strings.ToLower(strings.TrimSpace(s.Plan)) != "premium" {
-				http.Error(w, "Role finance butuh plan Premium", 402)
-				return
-			}
 		}
 
 		// Prevent locking out: must keep at least 1 admin.

@@ -10,12 +10,6 @@
             <div class="mt-1 text-sm text-[color:var(--muted)]">
               Trace transaksi harian dan pembukuan sederhana.
             </div>
-            <div
-              v-if="!subscriptionActive"
-              class="mt-2 inline-flex items-center rounded-full border border-red-200 bg-red-50 px-3 py-1 text-xs font-semibold text-red-700"
-            >
-              Subscription habis (read-only)
-            </div>
           </div>
 
           <div class="flex items-end gap-2">
@@ -305,7 +299,7 @@
             <button
               type="button"
               class="md:mt-5 rounded-xl bg-[color:var(--accent)] px-4 py-2 text-sm font-semibold text-white shadow-[0_14px_30px_rgba(193,122,59,0.30)] transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-60"
-              :disabled="ledgerSubmitting || !subscriptionActive"
+              :disabled="ledgerSubmitting"
               @click="addLedger"
             >
               <span v-if="!ledgerSubmitting">Tambah</span>
@@ -365,7 +359,7 @@
                       <button
                         type="button"
                         class="rounded-xl px-3 py-2 text-xs font-semibold text-[color:var(--danger)] hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-transparent"
-                        :disabled="!subscriptionActive"
+                        :disabled="false"
                         @click="removeLedger(e)"
                       >
                         Hapus
@@ -476,7 +470,6 @@ import {
 const router = useRouter()
 const auth = useAuthStore()
 const settings = useSettingsStore()
-const subscriptionActive = computed(() => settings.store?.subscription_active !== false)
 
 function todayLocalISO() {
   const d = new Date()

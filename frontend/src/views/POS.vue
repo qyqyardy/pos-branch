@@ -241,7 +241,7 @@
             <button
               type="button"
               class="mt-4 w-full rounded-xl bg-[color:var(--accent)] px-4 py-3 text-base font-semibold text-white shadow-[0_14px_30px_rgba(193,122,59,0.35)] transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-60"
-              :disabled="cart.length === 0 || !subscriptionActive"
+              :disabled="cart.length === 0"
               @click="openPay"
             >
               Bayar
@@ -249,9 +249,6 @@
 
             <div class="mt-2 text-center text-xs text-[color:var(--muted)]">
               Order tersimpan setelah konfirmasi pembayaran.
-            </div>
-            <div v-if="!subscriptionActive" class="mt-2 text-center text-xs text-red-700">
-              Subscription habis. Hubungi admin/vendor untuk perpanjang.
             </div>
           </div>
         </div>
@@ -610,11 +607,8 @@ const productsError = ref('')
 	const toast = ref(null)
 	let toastTimer = null
 
-const plan = computed(() => settings.store?.plan || 'premium')
-const subscriptionActive = computed(() => settings.store?.subscription_active !== false)
 const canFinance = computed(
-  () =>
-    (auth.user?.role === 'admin' || auth.user?.role === 'finance') && plan.value === 'premium'
+  () => (auth.user?.role === 'admin' || auth.user?.role === 'finance')
 )
 
 function showToast(type, message) {
@@ -1246,10 +1240,6 @@ const canConfirmCash = computed(() => {
 function openPay() {
   if (cart.value.length === 0) {
     showToast('error', 'Keranjang masih kosong')
-    return
-  }
-  if (!subscriptionActive.value) {
-    showToast('error', 'Subscription sudah habis. Hubungi admin/vendor untuk perpanjang.')
     return
   }
   isPayOpen.value = true
