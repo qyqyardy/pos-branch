@@ -9,7 +9,8 @@ function defaultStore() {
     tagline: 'Point of Sale',
     address_lines: ['', ''],
     phone: '',
-    logo_data_url: ''
+    logo_data_url: '',
+    footer_message: ''
   }
 }
 
@@ -51,7 +52,8 @@ export const useSettingsStore = defineStore('settings', {
             ? [data.address_lines[0] || '', data.address_lines[1] || '']
             : ['', ''],
           phone: data?.phone || '',
-          logo_data_url: data?.logo_data_url || ''
+          logo_data_url: data?.logo_data_url || '',
+          footer_message: data?.footer_message || ''
         })
       } catch (e) {
         this.error = e?.message || 'Gagal memuat setting'
@@ -78,7 +80,8 @@ export const useSettingsStore = defineStore('settings', {
           logo_data_url:
             data?.logo_data_url != null
               ? data.logo_data_url
-              : payload?.logo_data_url || this.store?.logo_data_url || ''
+              : payload?.logo_data_url || this.store?.logo_data_url || '',
+          footer_message: data?.footer_message || payload?.footer_message || ''
         })
         return this.store
       } catch (e) {

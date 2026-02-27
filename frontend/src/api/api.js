@@ -151,6 +151,14 @@ export async function getOrder(token, id) {
   return request(`/api/orders/${id}`, { token })
 }
 
+export async function updateOrderStatus(token, id, status) {
+  return request(`/api/orders/${id}/status`, {
+    method: 'PATCH',
+    token,
+    body: { status }
+  })
+}
+
 export async function listLedger(token, { date } = {}) {
   const qs = date ? `?date=${encodeURIComponent(date)}` : ''
   return request(`/api/ledger${qs}`, { token })

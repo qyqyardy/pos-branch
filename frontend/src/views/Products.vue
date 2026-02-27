@@ -43,7 +43,8 @@
                 <tr>
                   <th class="py-2" width="80">Gambar</th>
                   <th class="py-2">Nama</th>
-                  <th class="py-2">Harga</th>
+                   <th class="py-2">Harga</th>
+                  <th class="py-2 text-center" width="100">Stok</th>
                   <th class="py-2 text-center">Status</th>
                   <th class="py-2 text-right">Aksi</th>
                 </tr>
@@ -66,7 +67,12 @@
                   <td class="py-3">
                     <div class="font-semibold">{{ p.name }}</div>
                   </td>
-                  <td class="py-3 font-mono text-xs">{{ formatIDR(p.price) }}</td>
+                   <td class="py-3 font-mono text-xs">{{ formatIDR(p.price) }}</td>
+                  <td class="py-3 text-center">
+                    <span class="font-mono text-xs" :class="p.stock <= 5 ? 'text-red-600 font-bold' : ''">
+                      {{ p.stock }}
+                    </span>
+                  </td>
                   <td class="py-3 text-center">
                     <span
                       class="rounded-full px-2 py-1 text-[10px] font-bold uppercase tracking-wider"
@@ -168,13 +174,23 @@
             />
           </label>
 
-          <label class="block">
+           <label class="block">
             <span class="text-sm font-medium">Harga (IDR)</span>
             <input
               v-model.number="productModal.form.price"
               type="number"
               class="mt-1 w-full rounded-xl border border-black/10 bg-white px-4 py-3 text-sm outline-none focus:border-black/20 focus:shadow-[0_0_0_4px_rgba(193,122,59,0.15)]"
               placeholder="15000"
+            />
+          </label>
+
+          <label class="block">
+            <span class="text-sm font-medium">Stok (pcs/porsi)</span>
+            <input
+              v-model.number="productModal.form.stock"
+              type="number"
+              class="mt-1 w-full rounded-xl border border-black/10 bg-white px-4 py-3 text-sm outline-none focus:border-black/20 focus:shadow-[0_0_0_4px_rgba(193,122,59,0.15)]"
+              placeholder="100"
             />
           </label>
 
@@ -286,7 +302,8 @@ const productModal = ref({
   form: {
     name: '',
     price: 0,
-    is_active: true
+    is_active: true,
+    stock: 0
   }
 })
 
@@ -298,7 +315,7 @@ function openCreateProduct() {
     error: '',
     productId: null,
     imgPreview: '',
-    form: { name: '', price: 0, is_active: true }
+    form: { name: '', price: 0, is_active: true, stock: 0 }
   }
 }
 
@@ -313,7 +330,8 @@ function openEditProduct(p) {
     form: {
       name: p.name || '',
       price: p.price || 0,
-      is_active: p.is_active !== false
+      is_active: p.is_active !== false,
+      stock: p.stock || 0
     }
   }
 }
@@ -343,7 +361,8 @@ async function submitProductModal() {
     name: productModal.value.form.name,
     price: parseInt(productModal.value.form.price, 10),
     image_data_url: productModal.value.imgPreview,
-    is_active: productModal.value.form.is_active
+    is_active: productModal.value.form.is_active,
+    stock: parseInt(productModal.value.form.stock, 10) || 0
   }
 
   try {

@@ -51,6 +51,10 @@ func (s *OrderService) CreateOrder(userID uuid.UUID, req model.CreateOrderReques
 			return uuid.Nil, 0, err
 		}
 
+		if p.Stock < i.Qty {
+			return uuid.Nil, 0, errors.New("stok tidak mencukupi untuk " + p.Name)
+		}
+
 		total += int64(i.Qty) * p.Price
 
 		items = append(items, repository.OrderItemData{
@@ -115,6 +119,7 @@ func (s *OrderService) CreateOrder(userID uuid.UUID, req model.CreateOrderReques
 		Change:        change,
 		PaymentStatus: paymentStatus,
 		PaymentToken:  paymentToken,
+		KitchenStatus: "pending",
 	}
 
 	orderID, err := s.OrderRepo.Create(userID, items, total, meta)

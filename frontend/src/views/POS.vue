@@ -40,6 +40,7 @@
           Finance
         </button>
 
+
         <button
           v-if="auth.user?.role === 'admin'"
           type="button"
@@ -110,11 +111,21 @@
 	            :key="p.id"
 	            type="button"
 	            @click="addToCart(p)"
-	            class="group relative overflow-hidden rounded-2xl border border-black/10 bg-white/60 px-4 py-4 text-left shadow-[0_10px_30px_rgba(0,0,0,0.08)] transition hover:-translate-y-0.5 hover:bg-white/85 hover:shadow-[0_18px_50px_rgba(0,0,0,0.12)]"
+              :disabled="p.stock <= 0"
+	            class="group relative overflow-hidden rounded-2xl border border-black/10 bg-white/60 px-4 py-4 text-left shadow-[0_10px_30px_rgba(0,0,0,0.08)] transition hover:-translate-y-0.5 hover:bg-white/85 hover:shadow-[0_18px_50px_rgba(0,0,0,0.12)] disabled:opacity-60 disabled:hover:translate-y-0 disabled:grayscale"
 	          >
-	            <div class="absolute right-3 top-3 rounded-full bg-[color:rgba(193,122,59,0.12)] px-2 py-1 text-xs font-semibold text-[color:var(--accent)]">
+	            <div
+                v-if="p.stock > 0"
+                class="absolute right-3 top-3 rounded-full bg-[color:rgba(193,122,59,0.12)] px-2 py-1 text-xs font-semibold text-[color:var(--accent)]"
+              >
 	              + Tambah
 	            </div>
+              <div
+                v-else
+                class="absolute right-3 top-3 rounded-full bg-red-100 px-2 py-1 text-xs font-semibold text-red-700"
+              >
+                Habis
+              </div>
 
 	            <div class="mb-3 overflow-hidden rounded-xl border border-black/10 bg-white/50">
 	              <img
@@ -135,15 +146,23 @@
               <div class="text-xs tracking-widest uppercase text-[color:var(--muted)]">
                 Harga
               </div>
-              <div class="font-semibold">
+               <div class="font-semibold">
                 {{ formatIDR(p.price) }}
+              </div>
+            </div>
+
+            <div class="mt-2 flex items-center justify-between border-t border-black/5 pt-2 text-[10px]">
+              <div class="text-[color:var(--muted)] uppercase tracking-tight">Sisa Stok</div>
+              <div :class="p.stock <= 5 ? 'text-red-600 font-bold' : 'text-[color:var(--muted)] font-mono'">
+                {{ p.stock }} pcs
               </div>
             </div>
           </button>
         </div>
       </section>
 
-      <aside class="lg:sticky lg:top-24">
+      <aside class="flex flex-col gap-6 lg:sticky lg:top-24">
+        <!-- Keranjang Widget -->
         <div class="rounded-2xl border border-black/10 bg-[color:var(--paper)] backdrop-blur shadow-[0_18px_60px_rgba(0,0,0,0.10)]">
           <div class="flex items-center justify-between px-5 py-4">
             <div>
@@ -162,7 +181,7 @@
             </button>
           </div>
 
-          <div class="max-h-[55vh] overflow-auto px-5 pb-2">
+          <div class="max-h-[45vh] overflow-auto px-5 pb-2">
             <div
               v-if="cart.length === 0"
               class="rounded-xl border border-dashed border-black/15 bg-white/40 px-4 py-6 text-center"
@@ -249,6 +268,64 @@
 
             <div class="mt-2 text-center text-xs text-[color:var(--muted)]">
               Order tersimpan setelah konfirmasi pembayaran.
+            </div>
+          </div>
+        </div>
+
+        <!-- Monitoring Dapur Sidebar Widget -->
+        <div
+          class="flex flex-col rounded-2xl border border-black/10 bg-[color:var(--paper)] backdrop-blur shadow-[0_10px_30px_rgba(0,0,0,0.06)]"
+        >
+          <div class="border-b border-black/5 px-5 py-4">
+            <div class="flex items-center justify-between">
+              <h3 class="font-brand text-lg">Status Dapur</h3>
+              <button
+                type="button"
+                class="text-[10px] font-bold uppercase tracking-widest text-[color:var(--muted)] hover:text-black"
+                @click="loadRecentOrders"
+              >
+                Refresh
+              </button>
+            </div>
+          </div>
+
+          <div class="max-h-[300px] overflow-auto px-5 py-2">
+            <div v-if="ordersLoading && orders.length === 0" class="py-10 text-center text-xs text-[color:var(--muted)]">
+              Memuat status...
+            </div>
+            <div v-else-if="ordersError" class="py-10 text-center text-xs text-red-700">
+              {{ ordersError }}
+            </div>
+            <div v-else-if="orders.length === 0" class="py-10 text-center text-xs text-[color:var(--muted)]">
+              Belum ada pesanan aktif.
+            </div>
+            <div v-else class="divide-y divide-black/5">
+              <div
+                v-for="o in orders.slice(0, 5)"
+                :key="o.id"
+                class="flex items-center justify-between py-3"
+              >
+                <div class="flex flex-col min-w-0">
+                  <div class="font-mono text-[10px] font-bold text-[color:var(--muted)]">#{{ orderNoFromId(o.id) }}</div>
+                  <div class="text-sm font-semibold truncate">{{ o.customer_name || 'Pelanggan' }}</div>
+                  <div class="text-[10px] text-[color:var(--muted)]">
+                    {{ o.order_type === 'take_away' ? 'Take Away' : (o.table_no ? 'Meja ' + o.table_no : 'Dine In') }}
+                  </div>
+                </div>
+
+                <div
+                  class="rounded-lg border px-2 py-1 text-[9px] font-bold uppercase tracking-wider h-fit whitespace-nowrap"
+                  :class="statusClass(o.kitchen_status)"
+                >
+                  {{ statusLabel(o.kitchen_status) }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div v-if="orders.length > 5" class="border-t border-black/5 px-5 py-3">
+            <div class="text-[10px] font-bold uppercase tracking-widest text-[color:var(--muted)]">
+              + {{ orders.length - 5 }} pesanan lainnya
             </div>
           </div>
         </div>
@@ -577,12 +654,66 @@
 	import { useRouter } from 'vue-router'
 	import { useAuthStore } from '../stores/auth'
 	import { useSettingsStore } from '../stores/settings'
-	import { ApiError, createOrder, getProducts } from '../api/api'
+	// I need to import listOrders from api.js
+import { ApiError, createOrder, getProducts, listOrders } from '../api/api'
 	import { receiptConfig } from '../config/receipt'
 
 const auth = useAuthStore()
 const settings = useSettingsStore()
 const router = useRouter()
+
+const isOrdersOpen = ref(false)
+const orders = ref([])
+const ordersLoading = ref(false)
+const ordersError = ref('')
+let ordersInterval = null
+
+function openOrders() {
+  isOrdersOpen.value = true
+  loadRecentOrders()
+}
+
+function closeOrders() {
+  isOrdersOpen.value = false
+}
+
+async function loadRecentOrders() {
+  ordersLoading.value = true
+  ordersError.value = ''
+  try {
+    const date = new Date().toISOString().split('T')[0]
+    const list = await listOrders(auth.token, { date })
+    orders.value = Array.isArray(list) ? list : []
+  } catch (e) {
+    if (e instanceof ApiError && e.status === 401) {
+      auth.logout()
+      router.push('/')
+      return
+    }
+    ordersError.value = e?.message || 'Gagal memuat pesanan'
+  } finally {
+    ordersLoading.value = false
+  }
+}
+
+function statusLabel(s) {
+  switch (s) {
+    case 'pending': return 'Antri'
+    case 'preparing': return 'Masak'
+    case 'ready': return 'Siap'
+    case 'done': return 'Selesai'
+    default: return 'Antri'
+  }
+}
+
+function statusClass(s) {
+  switch (s) {
+    case 'preparing': return 'bg-blue-100 text-blue-700 border-blue-200'
+    case 'ready': return 'bg-amber-100 text-amber-700 border-amber-200'
+    case 'done': return 'bg-emerald-100 text-emerald-700 border-emerald-200'
+    default: return 'bg-gray-100 text-gray-600 border-gray-200'
+  }
+}
 
 const products = ref([])
 const loadingProducts = ref(true)
@@ -874,7 +1005,10 @@ function showToast(type, message) {
 </div>`
 			      : ''
 
-			  const footerLines = (receiptConfig.receipt?.footerLines || []).map(escapeHtml)
+			  const footerLinesToken = store.footer_message
+			    ? [store.footer_message]
+			    : (receiptConfig.receipt?.footerLines || [])
+			  const footerLines = footerLinesToken.map(escapeHtml)
 			  const footerBlock = footerLines.length
 			    ? footerLines
 			        .map(l => `<div class="small muted" style="text-align:center;">${l}</div>`)
@@ -1125,7 +1259,10 @@ function showToast(type, message) {
 	  productsError.value = ''
 	  try {
     const list = await getProducts(auth.token)
-    products.value = Array.isArray(list) ? list : []
+    products.value = (Array.isArray(list) ? list : []).map(p => ({
+      ...p,
+      stock: p.stock || 0
+    }))
   } catch (e) {
     if (e instanceof ApiError && e.status === 401) {
       auth.logout()
@@ -1158,7 +1295,16 @@ function showToast(type, message) {
 
 	  await settings.loadStore(auth.token)
 	  await loadProducts()
+	  await loadRecentOrders()
+
+	  // Polling kitchen status every 15s
+	  ordersInterval = setInterval(loadRecentOrders, 15000)
 	})
+
+  import { onUnmounted } from 'vue'
+  onUnmounted(() => {
+    if (ordersInterval) clearInterval(ordersInterval)
+  })
 
 
 const filteredProducts = computed(() => {
@@ -1174,6 +1320,12 @@ function addToCart(product) {
   if (!product?.id) return
 
   const existing = cart.value.find(i => i.id === product.id)
+  const currentQty = existing ? existing.qty : 0
+
+  if (currentQty >= (product.stock || 0)) {
+    showToast('error', `Stok tidak mencukupi untuk ${product.name}`)
+    return
+  }
 
   if (existing) {
     existing.qty++
@@ -1188,6 +1340,11 @@ function addToCart(product) {
 }
 
 function increase(item) {
+  const p = products.value.find(p => p.id === item.id)
+  if (p && item.qty >= (p.stock || 0)) {
+    showToast('error', `Stok tidak mencukupi untuk ${item.name}`)
+    return
+  }
   item.qty++
 }
 
@@ -1379,6 +1536,7 @@ function handleLogout() {
 	  cashReceived.value = ''
 	  isDoneOpen.value = true
 	  submitting.value = false
+    loadProducts() // Refresh stock levels
 	}
 
 </script>

@@ -61,6 +61,15 @@
         >
           Setting
         </button>
+
+        <button
+          v-if="canKitchen"
+          type="button"
+          class="rounded-xl border border-black/10 bg-white/70 px-3 py-2 text-sm font-semibold hover:bg-white"
+          @click="go('/kitchen')"
+        >
+          KDS
+        </button>
       </nav>
 
       <button
@@ -89,6 +98,9 @@ const canSettings = computed(() => role.value === 'admin')
 const canProducts = computed(() => role.value === 'admin')
 const canFinance = computed(
   () => (role.value === 'admin' || role.value === 'finance')
+)
+const canKitchen = computed(
+  () => (role.value === 'admin' || role.value === 'cashier' || role.value === 'kitchen')
 )
 const showPOS = computed(() => role.value === 'admin' || role.value === 'cashier')
 

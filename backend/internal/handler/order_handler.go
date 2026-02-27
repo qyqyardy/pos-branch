@@ -96,7 +96,7 @@ func (h *OrderHandler) ListOrders(w http.ResponseWriter, r *http.Request) {
 	rows, err := h.Service.OrderRepo.DB.Query(
 		`SELECT o.id, o.total, o.created_at,
 		        o.order_type, o.table_no, o.guest_count, o.customer_name,
-		        o.payment_method, o.received, o.change,
+		        o.payment_method, o.received, o.change, o.kitchen_status,
 		        u.id, u.name, u.email
 		   FROM orders o
 		   LEFT JOIN users u ON u.id = o.cashier_id
@@ -124,6 +124,7 @@ func (h *OrderHandler) ListOrders(w http.ResponseWriter, r *http.Request) {
 			payMethod    string
 			received     sql.NullInt64
 			change       sql.NullInt64
+			kitchen      string
 			cashierID    sql.NullString
 			cashierName  sql.NullString
 			cashierEmail sql.NullString
@@ -132,7 +133,7 @@ func (h *OrderHandler) ListOrders(w http.ResponseWriter, r *http.Request) {
 		if err := rows.Scan(
 			&id, &total, &createdAt,
 			&orderType, &tableNo, &guestCount, &customerName,
-			&payMethod, &received, &change,
+			&payMethod, &received, &change, &kitchen,
 			&cashierID, &cashierName, &cashierEmail,
 		); err != nil {
 			http.Error(w, "Server error", 500)
@@ -153,8 +154,9 @@ func (h *OrderHandler) ListOrders(w http.ResponseWriter, r *http.Request) {
 				}
 				return payMethod
 			}(),
-			"received": nullIfZeroInt64(received),
-			"change":   nullIfZeroInt64(change),
+			"received":       nullIfZeroInt64(received),
+			"change":         nullIfZeroInt64(change),
+			"kitchen_status": kitchen,
 			"cashier": map[string]any{
 				"id":    nullIfBlank(cashierID.String),
 				"name":  nullIfBlank(cashierName.String),
@@ -190,6 +192,7 @@ func (h *OrderHandler) GetOrder(w http.ResponseWriter, r *http.Request) {
 		payMethod    string
 		received     sql.NullInt64
 		change       sql.NullInt64
+		kitchen      string
 		cashierName  sql.NullString
 		cashierEmail sql.NullString
 	)
@@ -197,7 +200,7 @@ func (h *OrderHandler) GetOrder(w http.ResponseWriter, r *http.Request) {
 	err = h.Service.OrderRepo.DB.QueryRow(
 		`SELECT o.total, o.created_at,
 		        o.order_type, o.table_no, o.guest_count, o.customer_name,
-		        o.payment_method, o.received, o.change,
+		        o.payment_method, o.received, o.change, o.kitchen_status,
 		        u.name, u.email
 		   FROM orders o
 		   LEFT JOIN users u ON u.id = o.cashier_id
@@ -206,7 +209,7 @@ func (h *OrderHandler) GetOrder(w http.ResponseWriter, r *http.Request) {
 	).Scan(
 		&total, &createdAt,
 		&orderType, &tableNo, &guestCount, &customerName,
-		&payMethod, &received, &change,
+		&payMethod, &received, &change, &kitchen,
 		&cashierName, &cashierEmail,
 	)
 	if err != nil {
@@ -270,8 +273,9 @@ func (h *OrderHandler) GetOrder(w http.ResponseWriter, r *http.Request) {
 			}
 			return payMethod
 		}(),
-		"received": nullIfZeroInt64(received),
-		"change":   nullIfZeroInt64(change),
+		"received":       nullIfZeroInt64(received),
+		"change":         nullIfZeroInt64(change),
+		"kitchen_status": kitchen,
 		"cashier": map[string]any{
 			"name":  nullIfBlank(cashierName.String),
 			"email": nullIfBlank(cashierEmail.String),
@@ -320,6 +324,43 @@ func (h *OrderHandler) MidtransWebhook(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(200)
+}
+
+func (h *OrderHandler) UpdateKitchenStatus(w http.ResponseWriter, r *http.Request) {
+	idStr := mux.Vars(r)["id"]
+	id, err := uuid.Parse(idStr)
+	if err != nil {
+		http.Error(w, "Invalid order id", 400)
+		return
+	}
+
+	var req struct {
+		Status string `json:"status"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Invalid request body", 400)
+		return
+	}
+
+	status := strings.ToLower(strings.TrimSpace(req.Status))
+	valid := false
+	for _, s := range []string{"pending", "preparing", "ready", "done"} {
+		if status == s {
+			valid = true
+			break
+		}
+	}
+	if !valid {
+		http.Error(w, "Invalid kitchen status", 400)
+		return
+	}
+
+	if err := h.Service.OrderRepo.UpdateKitchenStatus(id, status); err != nil {
+		http.Error(w, "Failed to update kitchen status", 500)
+		return
+	}
+
+	w.WriteHeader(204)
 }
 
 func nullIfBlank(s string) any {

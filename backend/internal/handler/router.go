@@ -47,8 +47,8 @@ func SetupRoutes(db *sql.DB) http.Handler {
 	api.HandleFunc("/me", auth.Me).Methods("GET", "OPTIONS")
 	api.HandleFunc("/settings/store", settings.GetStore).Methods("GET", "OPTIONS")
 	api.HandleFunc("/products", product.GetProducts).Methods("GET", "OPTIONS")
-	api.HandleFunc("/analytics/sales", analytics.GetSalesSummary).Methods("GET", "OPTIONS")
-	api.HandleFunc("/analytics/top-products", analytics.GetTopProducts).Methods("GET", "OPTIONS")
+	api.Handle("/analytics/sales", middleware.RequireRoles("admin", "finance")(http.HandlerFunc(analytics.GetSalesSummary))).Methods("GET", "OPTIONS")
+	api.Handle("/analytics/top-products", middleware.RequireRoles("admin", "finance")(http.HandlerFunc(analytics.GetTopProducts))).Methods("GET", "OPTIONS")
 
 	admin := api.PathPrefix("/admin").Subrouter()
 	admin.Use(middleware.RequireRoles("admin"))
@@ -62,8 +62,9 @@ func SetupRoutes(db *sql.DB) http.Handler {
 	admin.HandleFunc("/users/{id}", userAdmin.DeleteUser).Methods("DELETE", "OPTIONS")
 
 	api.Handle("/orders", middleware.RequireRoles("admin", "cashier")(http.HandlerFunc(order.CreateOrder))).Methods("POST", "OPTIONS")
-	api.Handle("/orders", middleware.RequireRoles("admin", "finance")(http.HandlerFunc(order.ListOrders))).Methods("GET", "OPTIONS")
-	api.Handle("/orders/{id}", middleware.RequireRoles("admin", "finance")(http.HandlerFunc(order.GetOrder))).Methods("GET", "OPTIONS")
+	api.Handle("/orders", middleware.RequireRoles("admin", "finance", "kitchen")(http.HandlerFunc(order.ListOrders))).Methods("GET", "OPTIONS")
+	api.Handle("/orders/{id}", middleware.RequireRoles("admin", "finance", "kitchen")(http.HandlerFunc(order.GetOrder))).Methods("GET", "OPTIONS")
+	api.Handle("/orders/{id}/status", middleware.RequireRoles("admin", "cashier", "kitchen")(http.HandlerFunc(order.UpdateKitchenStatus))).Methods("PATCH", "OPTIONS")
 
 	api.Handle("/settings/store", middleware.RequireRoles("admin")(http.HandlerFunc(settings.UpdateStore))).Methods("PUT", "OPTIONS")
 

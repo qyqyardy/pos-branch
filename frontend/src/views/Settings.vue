@@ -110,6 +110,16 @@
                 placeholder="08xx-xxxx-xxxx"
               />
             </label>
+
+            <label class="block md:col-span-2">
+              <span class="text-sm font-medium">Pesan di Bawah Struk (Footer)</span>
+              <textarea
+                v-model.trim="storeForm.footer_message"
+                rows="3"
+                class="mt-1 w-full rounded-xl border border-black/10 bg-white px-4 py-3 text-sm outline-none focus:border-black/20 focus:shadow-[0_0_0_4px_rgba(193,122,59,0.15)]"
+                placeholder="Contoh: Terima kasih sudah mampir! | Jangan lupa follow IG kami @warkop"
+              ></textarea>
+            </label>
           </div>
 
           <p v-if="settings.error" class="mt-4 text-sm text-red-700">
@@ -268,6 +278,7 @@
               class="mt-1 w-full rounded-xl border border-black/10 bg-white px-4 py-3 text-sm outline-none focus:border-black/20 focus:shadow-[0_0_0_4px_rgba(193,122,59,0.15)]"
             >
               <option value="cashier">Kasir</option>
+              <option value="kitchen">Dapur</option>
               <option value="finance">Finance</option>
               <option value="admin">Superadmin</option>
             </select>
@@ -342,7 +353,8 @@ const storeForm = ref({
   tagline: '',
   address1: '',
   address2: '',
-  phone: ''
+  phone: '',
+  footer_message: ''
 })
 const savingStore = ref(false)
 
@@ -495,6 +507,7 @@ function showToast(msg) {
 function roleLabel(role) {
   if (role === 'admin') return 'Superadmin'
   if (role === 'finance') return 'Finance'
+  if (role === 'kitchen') return 'Dapur'
   return 'Kasir'
 }
 
@@ -515,7 +528,8 @@ function syncStoreForm() {
     tagline: s.tagline || '',
     address1: (s.address_lines && s.address_lines[0]) || '',
     address2: (s.address_lines && s.address_lines[1]) || '',
-    phone: s.phone || ''
+    phone: s.phone || '',
+    footer_message: s.footer_message || ''
   }
   logoPreview.value = s.logo_data_url || ''
   logoDirty.value = false
@@ -561,7 +575,8 @@ async function saveStore() {
       name: storeForm.value.name,
       tagline: storeForm.value.tagline,
       address_lines: [storeForm.value.address1, storeForm.value.address2],
-      phone: storeForm.value.phone
+      phone: storeForm.value.phone,
+      footer_message: storeForm.value.footer_message
     }
     if (logoDirty.value) payload.logo_data_url = logoPreview.value || ''
 

@@ -13,6 +13,7 @@ const routes = [
   { path: '/products', component: Products, meta: { requiresAuth: true, roles: ['admin'] } },
   { path: '/settings', component: Settings, meta: { requiresAuth: true, roles: ['admin'] } },
   { path: '/finance', component: Finance, meta: { requiresAuth: true, roles: ['admin', 'finance'] } },
+  { path: '/kitchen', component: () => import('../views/Kitchen.vue'), meta: { requiresAuth: true, roles: ['admin', 'cashier', 'kitchen'] } },
   { path: '/:pathMatch(.*)*', redirect: '/' }
 ]
 
@@ -36,6 +37,7 @@ router.beforeEach(async (to, from, next) => {
 
   const role = auth.user?.role || ''
   const homeByRole = () => {
+    if (role === 'kitchen') return '/kitchen'
     if (role === 'finance') return '/finance'
     if (role === 'admin' || role === 'cashier') return '/pos'
     return '/'

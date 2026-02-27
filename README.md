@@ -1,9 +1,11 @@
 # POS Warkop
 
-POS kasir sederhana untuk warkop/cafe: POS + cetak struk & kitchen ticket + dashboard finance + setting toko + manajemen user & produk.
+POS kasir sederhana untuk warkop/cafe: POS + KDS (Kitchen Display System) + cetak struk & kitchen ticket + dashboard finance + setting toko + manajemen user & produk.
 
 ## Fitur Unggulan Baru 🚀
 
+- **KDS (Kitchen Display System)**: Dashboard khusus dapur untuk memantau dan memproses pesanan secara real-time.
+- **Monitoring Dapur (POS Sidebar)**: Kasir dapat memantau status pesanan (pending, cooking, ready, done) langsung dari sidebar POS tanpa pindah halaman.
 - **Dashboard Khusus Produk**: Manajemen menu lebih rapi dan lapang di dashboard khusus.
 - **Tersedia/Habis (Stok)**: Sembunyikan produk dari POS secara instan jika stok sedang kosong.
 - **Integrasi Midtrans (QRIS Dinamis)**: Pembayaran otomatis via Midtrans Snap (QRIS, VA, dsb). Tidak perlu input nominal manual saat scan.
@@ -14,15 +16,20 @@ POS kasir sederhana untuk warkop/cafe: POS + cetak struk & kitchen ticket + dash
 
 - **POS (Kasir)**
   - Cari menu, tambah ke keranjang, atur qty.
+  - **Monitoring Dapur**: Lihat status progres makanan (diantre/dimasak/siap/selesai) secara live via sidebar.
   - Pembayaran Cash / QRIS (Manual) / **Midtrans (Otomatis)**.
   - Dine In / Take Away, input meja, jumlah tamu, nama pemesan.
   - Cetak Struk customer & Ticket kitchen.
+- **KDS (Kitchen Display System)**
+  - Dashboard khusus untuk kru dapur.
+  - Update status pesanan (Pending -> Cooking -> Ready -> Done) dengan sekali klik.
+  - Auto-refresh untuk pesanan baru.
 - **Produk (Dashboard Khusus)**
   - Tambah/Edit/Hapus menu + foto.
   - **Status Stok**: Aktifkan/Matikan menu (Disable menu jika kosong).
 - **Setting (Admin)**
   - Profil toko & Upload logo.
-  - Manajemen user: cashier, finance, admin (superadmin).
+  - Manajemen user: cashier, kitchen, finance, admin (superadmin).
 - **Finance (Admin/Finance)**
   - **Pencarian Order**: Cari transaksi berdasarkan ID / No Order.
   - Trace transaksi harian + detail order.
@@ -31,14 +38,15 @@ POS kasir sederhana untuk warkop/cafe: POS + cetak struk & kitchen ticket + dash
 
 ## Roles (Akses)
 
-- `cashier`: hanya POS, bisa buat order.
-- `finance`: akses menu Finance, laporan, dan pembukuan.
-- `admin`: akses semua fitur (POS + Finance + Setting + Users + Products).
+- `cashier`: akses POS (buat order & monitoring dapur).
+- `kitchen`: akses KDS (Kitchen Display System) saja.
+- `finance`: akses menu Finance (laporan & pembukuan).
+- `admin`: akses semua fitur (POS + KDS + Finance + Setting + Users + Products).
 
 ## Tech Stack
 
 - Backend: Go 1.22, Gorilla Mux, Postgres, JWT.
-- Frontend: Vue 3, Vite, TailwindCSS, Pinia.
+- Frontend: Vue 3 (Composition API), Vite, TailwindCSS, Pinia.
 - Payment: Midtrans Snap SDK integration.
 
 ## Environment Variables
@@ -84,8 +92,9 @@ Aplikasi menggunakan **Automated Migrations** di dalam kode Go.
 
 Konfigurasi di `frontend/src/config/receipt.js`. Mendukung printer thermal 58mm (default) dan 80mm.
 
-## API Endpoints (Baru)
+## API Endpoints (Baru/Penting)
 
+- `PATCH /api/orders/:id/status`: Update status dapur (oleh kitchen role).
 - `POST /api/webhooks/midtrans`: Webhook notifikasi pembayaran.
 - `POST /api/admin/products`: Tambah produk + foto.
 - `PUT /api/admin/products/:id`: Update produk + foto.

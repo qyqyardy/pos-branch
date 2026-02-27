@@ -26,12 +26,13 @@ func (h *SettingsHandler) GetStore(w http.ResponseWriter, r *http.Request) {
 		// Fresh DB without seed row (or manual deletion). Return a safe default.
 		if err == sql.ErrNoRows {
 			s = &model.StoreSettings{
-				Name:         "WARKOP",
-				Tagline:      "Point of Sale",
-				AddressLine1: "",
-				AddressLine2: "",
-				Phone:        "",
-				LogoDataURL:  "",
+				Name:          "WARKOP",
+				Tagline:       "Point of Sale",
+				AddressLine1:  "",
+				AddressLine2:  "",
+				Phone:         "",
+				LogoDataURL:   "",
+				FooterMessage: "",
 			}
 		} else {
 			http.Error(w, "Server error", 500)
@@ -41,23 +42,25 @@ func (h *SettingsHandler) GetStore(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]any{
-		"name":          s.Name,
-		"tagline":       s.Tagline,
-		"address_lines": []string{s.AddressLine1, s.AddressLine2},
-		"phone":         s.Phone,
-		"logo_data_url": s.LogoDataURL,
+		"name":           s.Name,
+		"tagline":        s.Tagline,
+		"address_lines":  []string{s.AddressLine1, s.AddressLine2},
+		"phone":          s.Phone,
+		"logo_data_url":  s.LogoDataURL,
+		"footer_message": s.FooterMessage,
 	})
 }
 
 func (h *SettingsHandler) UpdateStore(w http.ResponseWriter, r *http.Request) {
 	var req struct {
-		Name         string   `json:"name"`
-		Tagline      string   `json:"tagline"`
-		AddressLines []string `json:"address_lines"`
-		AddressLine1 string   `json:"address_line1"`
-		AddressLine2 string   `json:"address_line2"`
-		Phone        string   `json:"phone"`
-		LogoDataURL  *string  `json:"logo_data_url"`
+		Name          string   `json:"name"`
+		Tagline       string   `json:"tagline"`
+		AddressLines  []string `json:"address_lines"`
+		AddressLine1  string   `json:"address_line1"`
+		AddressLine2  string   `json:"address_line2"`
+		Phone         string   `json:"phone"`
+		LogoDataURL   *string  `json:"logo_data_url"`
+		FooterMessage string   `json:"footer_message"`
 	}
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -109,12 +112,13 @@ func (h *SettingsHandler) UpdateStore(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err := h.StoreRepo.Upsert(model.StoreSettings{
-		Name:         name,
-		Tagline:      tagline,
-		AddressLine1: addr1,
-		AddressLine2: addr2,
-		Phone:        phone,
-		LogoDataURL:  logo,
+		Name:          name,
+		Tagline:       tagline,
+		AddressLine1:  addr1,
+		AddressLine2:  addr2,
+		Phone:         phone,
+		LogoDataURL:   logo,
+		FooterMessage: strings.TrimSpace(req.FooterMessage),
 	})
 	if err != nil {
 		http.Error(w, "Failed to save settings", 400)

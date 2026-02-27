@@ -36,7 +36,7 @@ func normalizeRole(role string) string {
 
 func isValidRole(role string) bool {
 	switch role {
-	case "admin", "cashier", "finance":
+	case "admin", "cashier", "finance", "kitchen":
 		return true
 	default:
 		return false

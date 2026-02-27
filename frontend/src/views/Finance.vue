@@ -30,6 +30,14 @@
             >
               Refresh
             </button>
+            <button
+              type="button"
+              class="rounded-xl border border-black/10 bg-white/70 px-4 py-2 text-sm font-semibold hover:bg-white disabled:opacity-60"
+              :disabled="loading || orders.length === 0"
+              @click="exportCSV"
+            >
+              Export CSV
+            </button>
           </div>
         </div>
 
@@ -594,6 +602,36 @@ function persistOpeningForDate(date) {
   saveOpeningMap(map)
 }
 
+function exportCSV() {
+  if (orders.value.length === 0) return
+
+  const headers = ['Waktu', 'Order #', 'Tipe', 'Meja', 'Kasir', 'Bayar', 'Total']
+  const rows = filteredOrders.value.map(o => [
+    formatTime(o.created_at),
+    `#${orderNoFromId(o.id)}`,
+    o.order_type === 'take_away' ? 'Take Away' : 'Dine In',
+    o.table_no || '-',
+    o.cashier?.name || '-',
+    (o.payment_method || 'cash').toUpperCase(),
+    o.total
+  ])
+
+  const csvContent = [
+    headers.join(','),
+    ...rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(','))
+  ].join('\n')
+
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.setAttribute('href', url)
+  link.setAttribute('download', `sales-report-${selectedDate.value}.csv`)
+  link.style.visibility = 'hidden'
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+}
+
 const ledgerForm = ref({
   type: 'expense',
   payment_method: 'cash',
@@ -925,4 +963,22 @@ watch(
     persistOpeningForDate(selectedDate.value)
   }
 )
+function statusLabel(s) {
+  switch (s) {
+    case 'pending': return 'Antri'
+    case 'preparing': return 'Masak'
+    case 'ready': return 'Siap'
+    case 'done': return 'Selesai'
+    default: return 'Antri'
+  }
+}
+
+function statusClass(s) {
+  switch (s) {
+    case 'preparing': return 'bg-blue-100 text-blue-700 border-blue-200'
+    case 'ready': return 'bg-amber-100 text-amber-700 border-amber-200'
+    case 'done': return 'bg-emerald-100 text-emerald-700 border-emerald-200'
+    default: return 'bg-gray-100 text-gray-600 border-gray-200'
+  }
+}
 </script>
